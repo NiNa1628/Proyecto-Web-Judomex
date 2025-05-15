@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Judomex</title>
+    <link rel="website icon" type="png" href="assets/logo.png">
+    <link rel="stylesheet" href="Equipo.css" type="text/css"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <!-- Es la parte de la cabecera -->
+    <header class="header">
+        <div class="logo">
+                <img src="assets/logo.png" alt="Logo">
+        </div>
+
+        <div class="judomex_titulo">
+            <judomex_titulo>JUDOMEX</judomex_titulo>
+        </div>
+
+        <section class="search_bar">
+            <input type="text" class="search_text" placeholder="Busca aquí...">
+            <div class="button_Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </section>
+
+        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
+        <div class="auth_buttons" id="sessionButtons">
+            <a href="InicioSesion.html" class="button_LogIn">
+                <span class="text_Button">Log In</span>                
+            </a>
+            <a href="Registro.html" class="button_SignIn">
+                <span class="text_Button">Sign In</span>
+            </a>
+        </div>
+
+        <!-- Botones de usuario (cuando SÍ hay usuario logueado) -->
+        <div class="user_actions" id="userButtons" style="display: none;">
+            <a href="BolsaCompra.html" class="button_Buy">
+                <i class="fa-solid fa-bag-shopping"></i>
+            </a>
+            <a href="Perfil.html" class="button_User">
+                <i class="fa-solid fa-user"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- La barra de navegación -->
+    <section class="bar_buttons">
+        <!-- Botón de Inicio -->
+        <a href="Inicio.php" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Inicio</span>
+            </div>
+        </a>
+        <!-- Botón de Equipo -->
+        <a href="Equipo.php" class="nav-link">
+            <div class="select_Button">
+                <span class="seleccionado">Equipo</span>
+            </div>
+        </a>
+        <!-- Botón de Academia -->
+        <a href="Academia.php" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Academia</span>
+            </div>
+        </a>
+        <!-- Botón de Entrenamiento -->
+        <a href="Entrenamiento.php" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Entrenamiento</span>
+            </div>
+        </a>
+        <!-- Botón de Competencia -->
+        <a href="Competencia.php" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Competencia</span>
+            </div>
+        </a>
+    </section>
+
+    <!-- Venta de Judogis -->
+    <section class="bar_judogi">
+        <div class="container_texto">
+            <span class="texto_Seccion">Judogi</span>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Judogi Blanco Outshock', '1200.00', 'assets/jud1.jpg', 'Judogi de alta calidad para competición')">
+            <div class="product-image" style="background-image: url('assets/jud1.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Judogi Blanco <br>Outshock</h3>
+                <p class="product-price">$1200.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Judogi Blanco Mizuno', '7800.00', 'assets/jud2.jpg', 'Judogi oficial para torneos')">
+            <div class="product-image" style="background-image: url('assets/jud2.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Judogi Blanco <br>Mizuno</h3>
+                <p class="product-price">$7800.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Judogi Azul NKL', '920.00', 'assets/jud3.jpg', 'Judogi de alta calidad para competición')">
+            <div class="product-image" style="background-image: url('assets/jud3.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Judogi Azul <br>NKL</h3>
+                <p class="product-price">$920.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Judogi Blanco Adidas', '750.00', 'assets/jud4.jpg', 'Judogi de alta calidad para competición')">
+            <div class="product-image" style="background-image: url('assets/jud4.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Judogi Blanco <br>Adidas</h3>
+                <p class="product-price">$750.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Judogi Azul NKL', '860.00', 'assets/jud5.webp', 'Judogi de alta calidad para competición')">
+            <div class="product-image" style="background-image: url('assets/jud5.webp')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Judogi Azul <br>NKL</h3>
+                <p class="product-price">$860.00 mxn</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venta de cintas -->
+    <section class="bar_cintas">
+        <div class="container_texto">
+            <span class="texto_Seccion">Cintas</span>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Cinta Azul Fuji', '225.00', 'assets/cin1.jpg', 'Cinta de algodón resistente para grados kyu')">
+            <div class="product-image" style="background-image: url('assets/cin1.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Cinta Azul <br>Fuji</h3>
+                <p class="product-price">$225.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Cinta Negra Japan Mizuno', '1440.00', 'assets/cin2.jpg', 'Cinta negra oficial Mizuno para danes')">
+            <div class="product-image" style="background-image: url('assets/cin2.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Cinta Negra <br>Japan Mizuno</h3>
+                <p class="product-price">$1440.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Cinta Naranja Mizuno', '560.00', 'assets/cin3.jpg', 'Cinta naranja de alta durabilidad')">
+            <div class="product-image" style="background-image: url('assets/cin3.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Cinta Naranja <br>Mizuno</h3>
+                <p class="product-price">$560.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Cinta Amarilla Fuji', '225.00', 'assets/cin4.jpg', 'Cinta amarilla para principiantes')">
+            <div class="product-image" style="background-image: url('assets/cin4.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Cinta Amarilla <br>Fuji</h3>
+                <p class="product-price">$225.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Cinta Roja Mizuno', '550.00', 'assets/cin5.png', 'Cinta roja para grados avanzados')">
+            <div class="product-image" style="background-image: url('assets/cin5.png')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Cinta Roja <br>Mizuno</h3>
+                <p class="product-price">$550.00 mxn</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Venta de rodilleras -->
+    <section class="bar_rodilleras">
+        <div class="container_texto">
+            <span class="texto_Seccion">Rodilleras</span>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Rodilleras Negras Mizuno', '430.00', 'assets/rod1.jpg', 'Protección durable para entrenamiento')">
+            <div class="product-image" style="background-image: url('assets/rod1.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Rodilleras Negras <br>Mizuno</h3>
+                <p class="product-price">$430.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Rodilleras Rojas Mizuno', '670.00', 'assets/rod2.jpg', 'Rodilleras acolchadas para competencia')">
+            <div class="product-image" style="background-image: url('assets/rod2.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Rodilleras Rojas <br>Mizuno</h3>
+                <p class="product-price">$670.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Rodilleras Azules Mizuno', '490.00', 'assets/rod3.jpg', 'Protección ligera para dojo')">
+            <div class="product-image" style="background-image: url('assets/rod3.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Rodilleras Azules <br>Mizuno</h3>
+                <p class="product-price">$490.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Rodilleras Blancas Mizuno', '610.00', 'assets/rod4.jpg', 'Diseño ergonómico para máximo confort')">
+            <div class="product-image" style="background-image: url('assets/rod4.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Rodilleras Blancas <br>Mizuno</h3>
+                <p class="product-price">$610.00 mxn</p>
+            </div>
+        </div>
+        <div class="product-card" onclick="showProductDetail('Rodilleras VSI Negras Mizuno', '610.00', 'assets/rod5.jpg', 'Refuerzo lateral para mayor soporte')">
+            <div class="product-image" style="background-image: url('assets/rod5.jpg')"></div>
+            <div class="product-info">
+                <h3 class="product-name">Rodilleras VSI <br>Negras Mizuno</h3>
+                <p class="product-price">$610.00 mxn</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Por si pongo créditos -->
+    <div class="container2">
+
+    </div>
+
+    <script>
+        // Base de datos de productos en JavaScript para el frontend
+        const productsDB = {
+            'Judogi Blanco Outshock': {
+                sizes: ['S', 'M', 'L', 'XL'],
+                stock: {
+                    'S': 5,
+                    'M': 8,
+                    'L': 6,
+                    'XL': 3
+                }
+            },
+            'Judogi Blanco Mizuno': {
+                sizes: ['S', 'M', 'L'],
+                stock: {
+                    'S': 3,
+                    'M': 4,
+                    'L': 2
+                }
+            },
+            // Agrega aquí el resto de productos con sus tallas y stock...
+        };
+
+        function showProductDetail(name, price, image, description) {
+            // Cerrar cualquier modal existente primero
+            const existingModal = document.getElementById('productModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Obtener información del producto
+            const product = productsDB[name] || {
+                sizes: ['Única'],
+                stock: {'Única': 10} // Valor por defecto para productos sin talla
+            };
+            
+            // Crear opciones de talla
+            let sizeOptions = '';
+            for (const size of product.sizes) {
+                const stock = product.stock[size] || 0;
+                sizeOptions += `<option value="${size}" ${stock <= 0 ? 'disabled' : ''}>${size} ${stock <= 0 ? '(Agotado)' : ''}</option>`;
+            }
+            
+            // Crear el modal
+            const modal = document.createElement('div');
+            modal.id = 'productModal';
+            modal.className = 'modal';
+            
+            // Contenido del modal con imagen centrada
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <span class="close" onclick="closeModal()">&times;</span>
+                    <div class="modal-image-container">
+                        <img src="${image}" alt="${name}" class="modal-image">
+                    </div>
+                    <h4>${name}</h4>
+                    <p class="price">$${price} mxn</p>
+                    <p class="description">${description}</p>
+                    <form method="post">
+                        <input type="hidden" name="product_name" value="${name}">
+                        <input type="hidden" name="product_price" value="${price}">
+                        <input type="hidden" name="product_image" value="${image}">
+                        <input type="hidden" name="product_description" value="${description}">
+                        
+                        <div class="form-group">
+                            <label for="product_size">Talla:</label>
+                            <select name="product_size" id="product_size" required onchange="updateStockInfo('${name}', this.value)">
+                                ${sizeOptions}
+                            </select>
+                            <div id="stockInfo" class="stock-info"></div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="product_quantity">Cantidad:</label>
+                            <input type="number" name="product_quantity" id="product_quantity" min="1" value="1" required>
+                        </div>
+                        
+                        <button type="submit" name="add_to_cart" class="add-to-cart">
+                            <i class="fas fa-shopping-cart"></i> Añadir al carrito
+                        </button>
+                    </form>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            modal.style.display = 'block';
+            
+            // Actualizar información de stock al cargar
+            const initialSize = document.getElementById('product_size').value;
+            updateStockInfo(name, initialSize);
+            
+            // Configurar el evento para cerrar al hacer clic fuera
+            modal.onclick = function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            };
+        }
+        
+        function updateStockInfo(productName, size) {
+            const product = productsDB[productName];
+            const stockInfo = document.getElementById('stockInfo');
+            
+            if (product && product.stock && product.stock[size] !== undefined) {
+                const stock = product.stock[size];
+                if (stock > 0) {
+                    stockInfo.textContent = `Disponibles: ${stock}`;
+                    stockInfo.className = 'stock-info';
+                    
+                    // Ajustar cantidad máxima
+                    const quantityInput = document.getElementById('product_quantity');
+                    quantityInput.max = stock;
+                    if (quantityInput.value > stock) {
+                        quantityInput.value = stock;
+                    }
+                } else {
+                    stockInfo.textContent = 'Agotado';
+                    stockInfo.className = 'stock-info out-of-stock';
+                    
+                    // Deshabilitar el botón de añadir al carrito
+                    const addButton = document.querySelector('.add-to-cart');
+                    addButton.disabled = true;
+                    addButton.style.opacity = '0.6';
+                }
+            } else {
+                stockInfo.textContent = '';
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('productModal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.remove(); // Esto elimina el modal del DOM completamente
+            }
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('productModal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Verificar si hay un usuario logueado (ejemplo con localStorage)
+        const usuarioLogueado = localStorage.getItem('usuarioLogueado');
+        
+        const sessionButtons = document.getElementById('sessionButtons');
+        const userButtons = document.getElementById('userButtons');
+        
+        if (usuarioLogueado) {
+            // Ocultar botones de sesión y mostrar botones de usuario
+            sessionButtons.style.display = 'none';
+            userButtons.style.display = 'flex';
+        } else {
+            // Asegurarse que los botones de usuario están ocultos
+            userButtons.style.display = 'none';
+            sessionButtons.style.display = 'flex';
+        }
+    });
+    </script>
+</body>
+</html>

@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="Academia.css" type="text/css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Leaflet CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
         /* Estilos mejorados para el mapa */
@@ -27,7 +26,7 @@
         }
         
         .location-container {
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%);
+            background: #f5f7fa;
             padding: 20px;
             border-radius: 12px;
             margin: 20px 0;
@@ -35,6 +34,7 @@
             width: 90%;
             left: 5%;
             position: absolute;
+            border: 1px solid rgb(210, 209, 209);
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
         
@@ -117,15 +117,56 @@
             border: 3px solid white;
             box-shadow: 0 2px 5px rgba(0,0,0,0.3);
         }
-        
-        /* Animación de carga */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+
+        .academias{
+            position: absolute;
+            width: 90%;
+            height: 90px;
+            top: 102vh;
+            left:5%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
-        
-        .spin {
-            animation: spin 1s linear infinite;
+
+        .academia-card {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            border-left: 4px solid #3046CF;
+            cursor: pointer;
+        }
+
+        .academia-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+        }
+
+        .academia-card h3 {
+            color: #3046CF;
+            margin-top: 0;
+            margin-bottom: 6px;
+            font-size: 16px;
+        }
+
+        .academia-card p {
+            color: #555;
+            line-height: 1.6;
+            margin: 0;
+            font-size: 12px;
+        }
+
+        /* Por si pongo créditos */
+        .container2 {
+            width: 100%;
+            height: 33px;
+            margin-top: 23vh;
+            background: #3046CF;
         }
     </style>
 </head>
@@ -235,6 +276,36 @@
         </div>
     </section>
 
+    <div class="academias">
+        <div class="academia-card">
+            <h3>Wolf Defense</h3>
+            <p>Cordillera Oriental #313,
+            Lomas 3° sección, 78216
+            San Luis Potosí, S.L.P.</p>
+        </div>
+        
+        <div class="academia-card">
+            <h3>Academia de Judo El Equipo</h3>
+            <p>Mariano Otero 465,
+            Tequisquiapan, 78250
+            San Luis Potosí, S.L.P.</p>
+        </div>
+        
+        <div class="academia-card">
+            <h3>SADECO</h3>
+            <p>Dolores Jiménez y Muro 155,
+            Colonial Nuevo Paseo, 78320
+            San Luis Potosí, S.L.P.</p>
+        </div>
+        
+        <div class="academia-card">
+            <h3>Elit Combat Center</h3>
+            <p>Amado Nervo 486,
+            De Tequisquiapan, 78250
+            San Luis Potosí, S.L.P.</p>
+        </div>
+    </div>
+
     <div class="container2">
         
     </div>
@@ -255,7 +326,10 @@
         let map, userMarker, lastPosition;
         
         // Icono personalizado para el marcador
-        const customIcon = L.divIcon({className: 'custom-marker',iconSize: [24, 24]});
+        const customIcon = L.divIcon({
+            className: 'custom-marker',
+            iconSize: [24, 24]
+        });
         
         // Inicializar el mapa de forma optimizada
         function initMap(lat, lng) {
@@ -435,8 +509,8 @@
                 showPosition,
                 handleError,
                 {
-                    enableHighAccuracy: mapConfig.highAccuracy,
-                    timeout: mapConfig.timeout,
+                    enableHighAccuracy: true,
+                    timeout: 15000,
                     maximumAge: 0 // Ignorar caché
                 }
             );
@@ -450,6 +524,80 @@
                 }
             });
         }
+
+        const academias = [
+            {
+                nombre: "Wolf Defense",
+                direccion: "Cordillera Oriental #313, Lomas 3° sección, 78216 San Luis Potosí, S.L.P.",
+                lat: 22.123456,
+                lng: -101.123456
+            },
+            {
+                nombre: "Academia de Judo El Equipo",
+                direccion: "Mariano Otero 465, Tequisquiapan, 78250 San Luis Potosí, S.L.P.",
+                lat: 22.123457,
+                lng: -101.123457
+            },
+            {
+                nombre: "SADECO",
+                direccion: "Dolores Jiménez y Muro 155, Colonial Nuevo Paseo, 78320 San Luis Potosí, S.L.P.",
+                lat: 22.123458,
+                lng: -101.123458
+            },
+            {
+                nombre: "Elit Combat Center",
+                direccion: "Amado Nervo 486, De Tequisquiapan, 78250 San Luis Potosí, S.L.P.",
+                lat: 22.123459,
+                lng: -101.123459
+            }
+        ];
+        
+        // Icono para las academias
+        const academiaIcon = L.divIcon({
+            className: 'academia-marker',
+            iconSize: [24, 24]
+        });
+        
+        let academiaMarkers = [];
+        
+        // Función para mostrar la academia en el mapa
+        function mostrarAcademiaEnMapa(index) {
+            // Remover marcadores anteriores
+            academiaMarkers.forEach(marker => map.removeLayer(marker));
+            academiaMarkers = [];
+            
+            // Remover clase active de todas las tarjetas
+            document.querySelectorAll('.academia-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            
+            // Añadir clase active a la tarjeta seleccionada
+            event.currentTarget.classList.add('active');
+            
+            const academia = academias[index];
+            
+            // Crear marcador para la academia
+            const marker = L.marker([academia.lat, academia.lng], {
+                icon: academiaIcon,
+                title: academia.nombre,
+                riseOnHover: true
+            }).addTo(map)
+            .bindPopup(`<b>${academia.nombre}</b><br>${academia.direccion}`)
+            .openPopup();
+            
+            academiaMarkers.push(marker);
+            
+            // Centrar el mapa en la academia
+            map.setView([academia.lat, academia.lng], 16);
+        }
+        
+        // Asignar eventos a las tarjetas de academia
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.academia-card');
+            cards.forEach((card, index) => {
+                card.addEventListener('click', (e) => mostrarAcademiaEnMapa(index));
+            });
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
         // Verificar si hay un usuario logueado (ejemplo con localStorage)
