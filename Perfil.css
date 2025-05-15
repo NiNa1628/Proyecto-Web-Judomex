@@ -1,0 +1,143 @@
+/* Estilos generales */
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFFFFF;
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+/* Header */
+.header {
+    background-color: #3046CF;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.judomex-title {
+    font-size: 48px;
+    font-weight: 800;
+    margin: 0;
+}
+
+/* Contenedor principal */
+.profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+}
+
+/* Sección de foto de perfil */
+.profile-picture {
+    text-align: center;
+}
+
+.profile-img {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #3046CF;
+    margin-bottom: 20px;
+}
+
+.upload-btn {
+    background-color: #3046CF;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+/* Sección de información */
+.profile-info {
+    background-color: #f5f5f5;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.section-title {
+    color: #3046CF;
+    font-size: 24px;
+    font-weight: 700;
+    margin-top: 0;
+    border-bottom: 2px solid #3046CF;
+    padding-bottom: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.info-item {
+    margin-bottom: 15px;
+}
+
+.info-label {
+    font-weight: 600;
+    color: #3046CF;
+    margin-bottom: 5px;
+    display: block;
+}
+
+.info-value {
+    background-color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    border-left: 4px solid #3046CF;
+}
+
+.full-width {
+    grid-column: span 2;
+}
+
+/* Botones */
+.action-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+.edit-btn, .logout-btn {
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.edit-btn {
+    background-color: #3046CF;
+    color: white;
+    border: none;
+}
+
+.logout-btn {
+    background-color: white;
+    color: #3046CF;
+    border: 2px solid #3046CF;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-container {
+        grid-template-columns: 1fr;
+    }
+    
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .full-width {
+        grid-column: span 1;
+    }
+}

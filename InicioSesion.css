@@ -1,0 +1,159 @@
+/* Estilos generales */
+body{
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    background: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Título de Judomex */
+.container_Judomex{
+    position: absolute;
+    width: 450px;
+    height: 60px;
+    left: 37%;
+    top: 8vh;
+}
+
+.texto_Judomex{
+    position: absolute;
+    left: 15%;
+
+    color: #3046CF;
+    font-style: normal;
+    font-weight: 750;
+    font-size: 50px;
+}
+
+/* Container del Inicio de sesión */
+.container_InicioSesion{
+    position: absolute;
+    width: 400px;
+    height: 500px;
+    top: 18vh;
+    left: 37%;
+
+    background-color: #3046CF;
+    border: 2px solid #3046CF;
+    border-radius: 20px;
+}
+
+.mensaje_error{
+    font-style: normal;
+    font-weight: 700;
+    color: #e74c3c;
+    text-align: center;
+    margin-bottom: 15px;
+    display: none;
+}
+
+/* Container de usuario */
+.container_Usuario{
+    position: absolute;
+    width: 350px;
+    height: 110px;
+    top: 8vh;
+    left: 6%;
+
+    border-radius: 20px;
+}
+
+/* Container de contraseña */
+.container_Contraseña{
+    position: absolute;
+    width: 350px;
+    height: 110px;
+    top: 25vh;
+    left: 6%;
+
+    border-radius: 20px;
+}
+
+.texto_Seccion{
+    position: absolute;
+    top: 10%;
+    left: 3%;
+    font-size: 20px;
+    font-weight: 700;
+    font-style: normal;
+    color: #FFFFFF;
+}
+
+/* Para agregar el texto */
+.container_Campo{
+    position: absolute;
+    top: 43%;
+    left: 3%;
+    height: 50px;
+    width: 320px; 
+
+    background-color: #FFFFFF;
+    border-radius: 20px;
+}
+
+.texto_Llenador{
+    position: absolute;
+    top: 12%;
+    left: 2%;
+
+    width: 96%;
+    height: 80%;
+    padding: 5px;
+    
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: black;
+    background-color: transparent;
+}
+
+/*Texto de crear cuenta */
+.texto_NuevaCuenta{
+    position: absolute;
+    top: 60%;
+    left: 52%;
+
+    font-size: 14px;
+    font-weight: 500;
+    color: #FFFFFF;
+}
+
+/* Botón de Google */
+.button_Google{
+    position: absolute;
+    width: 50px;
+    height: 35px;
+    left: 45%;
+    top: 70%;
+}
+
+.button_Google i {
+    font-size: 35px;
+    color: white;
+}
+
+/* Botón de Iniciar Sesión */
+.button_Iniciar{
+    position: absolute;
+    top: 83%;
+    left: 30%;
+    height: 45px;
+    width: 150px; 
+
+    background-color: #FFFFFF;
+    border-radius: 20px;
+}
+
+.texto_IniciarSesion{
+    position: absolute;
+    top: 14%;
+    left: 6%;
+
+    font-size: 20px;
+    font-weight: 800;
+    font-style: normal;
+    color: #3046CF;
+}

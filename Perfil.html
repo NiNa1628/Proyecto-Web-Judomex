@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Perfil de Usuario</title>
+    <link rel="website icon" type="png" href="assets/logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</head>
+<body>
+    <header class="header">
+        <h1 class="judomex-title">JUDOMEX</h1>
+    </header>
+
+    <div class="profile-container">
+        <!-- Sección de foto de perfil -->
+        <div class="profile-picture">
+            <img src="assets/hombre.png" alt="Foto de perfil" class="profile-img">
+            <button class="upload-btn">Cambiar foto</button>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="color: #3046CF; margin-bottom: 10px;">Miembro desde:</h3>
+                <p id="member-since">15 de Marzo, 2023</p>
+            </div>
+        </div>
+
+        <!-- Sección de información -->
+        <div class="profile-info">
+            <h2 class="section-title">Información Personal</h2>
+            
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Nombre:</span>
+                    <div class="info-value" id="profile-name">Juan</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Apellidos:</span>
+                    <div class="info-value" id="profile-lastname">Pérez García</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Fecha de Nacimiento:</span>
+                    <div class="info-value" id="profile-birthdate">12 de Mayo, 1990</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Género:</span>
+                    <div class="info-value" id="profile-gender">Hombre</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Correo Electrónico:</span>
+                    <div class="info-value" id="profile-email">juan.perez@example.com</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Teléfono:</span>
+                    <div class="info-value" id="profile-phone">+52 55 1234 5678</div>
+                </div>
+            </div>
+            
+            <h2 class="section-title" style="margin-top: 30px;">Dirección</h2>
+            
+            <div class="info-grid">
+                <div class="info-item full-width">
+                    <span class="info-label">Calle:</span>
+                    <div class="info-value" id="profile-street">Av. Revolución #123</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Colonia:</span>
+                    <div class="info-value" id="profile-neighborhood">San Ángel</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Código Postal:</span>
+                    <div class="info-value" id="profile-zip">01000</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">País:</span>
+                    <div class="info-value" id="profile-country">México</div>
+                </div>
+                
+                <div class="info-item">
+                    <span class="info-label">Estado:</span>
+                    <div class="info-value" id="profile-state">Ciudad de México</div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="edit-btn" onclick="location.href='editar-perfil.html'">
+                    <i class="fas fa-edit"></i> Editar Perfil
+                </button>
+                <button class="logout-btn" onclick="location.href='logout.html'">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Judomex</title>
+        <link rel="website icon" type="png" href="assets/logo.png">
+        <link rel="stylesheet" href="Academia.css" type="text/css"/>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    </head>
+<body>
+    <!-- Es la parte de la cabecera -->
+    <header class="header">
+        <div class="logo">
+                <img src="assets/logo.png" alt="Logo">
+        </div>
+
+        <div class="judomex_titulo">
+            <judomex_titulo>JUDOMEX</judomex_titulo>
+        </div>
+
+        <section class="search_bar">
+            <input type="text" class="search_text" placeholder="Busca aquí...">
+            <div class="button_Search">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+        </section>
+
+        <div class="auth_buttons" id="sessionButtons"></section>
+            <a href="InicioSesion.html" class="button_LogIn">
+                    <span class="text_Button">Log In</span>                
+            </a>
+
+            <a href="Registro.html" class="button_SignIn">
+                    <span class="text_Button">Sign In</span>
+            </a>
+        </div>
+
+        <div class="user_actions" id="userButtons"></section>
+        <a href="BolsaCompra.html" class="button_Buy">
+                <i class="fa-solid fa-bag-shopping"></i>
+         </a>
+
+            <a href="Perfil.html" class="button_User">
+                <i class="fa-solid fa-user"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- La barra de navegación -->
+    <section class="bar_buttons">
+        <!-- Botón de Inicio -->
+        <a href="Inicio.html" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Inicio</span>
+            </div>
+        </a>
+        <!-- Botón de Equipo -->
+        <a href="Equipo.html" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Equipo</span>
+            </div>
+        </a>
+        <!-- Botón de Academia -->
+        <a href="Academia.html" class="nav-link">
+            <div class="select_Button">
+                <span class="seleccionado">Academia</span>
+            </div>
+        </a>
+        <!-- Botón de Entrenamiento -->
+        <a href="Entrenamiento.html" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Entrenamiento</span>
+            </div>
+        </a>
+        <!-- Botón de Competencia -->
+        <a href="Competencia.html" class="nav-link">
+            <div class="noSelect_Button">
+                <span class="noSeleccionado">Competencia</span>
+            </div>
+        </a>
+    </section>
+
+    <!-- Sobre la ubicación -->
+    <section class="container_Ubicacion">
+        <span class="texto_Ubicacion">Ubicación</span>
+        <div class="location">
+            <i class="fa-solid fa-location-dot"></i>
+        </div>
+            <span class="texto_Localitation">Av. Niño Artillero 140, 
+                Zona Universitaria, 78240 San Luis Potosí, S.L.P.</span>
+    </section>
+
+    <!-- Por si pongo créditos -->
+    <div class="container2">
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si hay un usuario logueado
+            const usuarioRegistrado = JSON.parse(localStorage.getItem('usuarioRegistrado'));
+            const sessionButtons = document.getElementById('sessionButtons');
+            const userButtons = document.getElementById('userButtons');
+            
+            if (usuarioRegistrado) {
+                // Ocultar botones de sesión y mostrar botones de usuario
+                sessionButtons.style.display = 'none';
+                userButtons.style.display = 'flex';
+            }
+        });
+    </script>
+
+</body>
+</html>

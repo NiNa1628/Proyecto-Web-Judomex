@@ -1,0 +1,423 @@
+/* Estilos generales */
+body{
+    position: relative;
+    width: 100%;
+    height: 100%;
+
+    background: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+}
+
+/* Donde irán todos los campos */
+.container{
+    position: relative;
+    justify-content: center;
+    width: 90%;
+    height: 600px;
+    top: 10vh;
+
+    background-color: #9d9d9d80;
+    border-radius: 20px;
+}
+
+/* Título de Judomex */
+.container_Judomex{
+    position: absolute;
+    width: 450px;
+    height: 60px;
+    left: 36%;
+    top: 2%;
+}
+
+.texto_Judomex{
+    position: absolute;
+    top: -30%;
+    left: 2%;
+
+    color: #3046CF;
+    font-style: normal;
+    font-weight: 800;
+    font-size: 60px;
+}
+
+/* Tamaño y tipo de letra */
+.texto_Instruccion{
+    position: absolute;
+    left: 2%;
+    top: 2%;
+
+    color: #3046CF;
+    font-size: 20px;
+    font-weight: 700;
+    font-style: normal;
+}
+
+.texto_Asignacion{
+    position: absolute;
+    top: 12%;
+    left: 2%;
+
+    width: 96%;
+    height: 80%;
+    padding: 5px;
+    
+    border: none;
+    outline: none;
+    font-size: 16px;
+    font-weight: 600;
+    color: black;
+    background-color: transparent;
+}
+
+.container_NombreTexto{
+    position: absolute;
+    width: 430px;
+    height: 40px;
+    top: 40%;
+    left: 1%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Nombre */
+.container_Nombre{
+    position: absolute;
+    width: 450px;
+    height: 80px;
+    top: 12%;
+}
+
+/* Apellidos */
+.container_Apellido{
+    position: absolute;
+    width: 450px;
+    height: 80px;
+    top: 28%;
+}
+
+/* Email */
+.container_Email{
+    position: absolute;
+    width: 450px;
+    height: 80px;
+    top: 44%;
+}
+
+/* Telefono */
+.container_Telefono{
+    position: absolute;
+    width: 450px;
+    height: 80px;
+    top: 60%;
+}
+
+/* Fecha de nacimiento */
+.container_Calendario{
+    position: absolute;
+    width: 220px;
+    height: 70px;
+    top: 76%;
+}
+
+label{
+    position: absolute;
+    top: 2%;
+    left: 2%;
+    color: #3046CF;
+    font-size: 20px;
+    font-weight: 700;
+    font-style: normal;
+}
+
+input{
+    position: absolute;
+    top: 45%;
+    left: 15%;
+    font-size: 16px;
+    color: darkgray;
+    border: 3px solid gray;
+    border-radius: 10px;
+}
+
+/* Sexo */
+.container_Sexo{
+    position: absolute;
+    width: 220px;
+    height: 70px;
+    top: 76%;
+    left: 21.5%;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.dropdown {
+    width: 160px;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+    top: 2vh;
+    transition: all 0.3s ease;
+}
+
+.custom-dropdown {
+    width: 200px;
+    text-align: left;
+    position: relative;
+    padding-right: 30px; /* Espacio para la flecha */
+}
+
+.custom-dropdown::after {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.dropdown-menu {
+    width: 200px;
+}
+
+.dropdown-item {
+    padding: 8px 15px;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s;
+}
+
+.dropdown-item:hover {
+    background-color: #f8f9fa;
+    color: #3046CF;
+}
+
+/* Calle */
+.container_TextoCalle{
+    position: absolute;
+    width: 370px;
+    height: 40px;
+    top: 40%;
+    left: 1%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+.container_Calle{
+    position: absolute;
+    width: 390px;
+    height: 80px;
+    top:12%;
+    left: 44.6%;
+}
+
+.container_TextoNum{
+    position: absolute;
+    width: 90px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Número Exterior */
+.container_Numero{
+    position: absolute;
+    width: 100px;
+    height: 80px;
+    top: 12%;
+    left: 80%;
+}
+
+/* Número Interior*/
+.container_Interior{
+    position: absolute;
+    width: 100px;
+    height: 80px;
+    top: 12%;
+    left: 90%;
+}
+
+/* Colonia */
+.container_Colonia{
+    position: absolute;
+    width: 450px;
+    height: 80px;
+    top: 28%;
+    left: 44.6%;
+}
+
+.container_TextoColonia{
+    position: absolute;
+    width: 425px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Código Postal */
+.container_CP{
+    position: absolute;
+    width: 155px;
+    height: 80px;
+    top: 28%;
+    left: 85.2%;
+}
+
+.container_TextoCP{
+    position: absolute;
+    width: 140px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* País */
+.container_Pais{
+    position: absolute;
+    width: 390px;
+    height: 80px;
+    top: 44%;
+    left: 44.6%;
+}
+
+.container_TextoPais{
+    position: absolute;
+    width: 425px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Estado */
+.container_Estado{
+    position: absolute;
+    width: 215px;
+    height: 80px;
+    top: 44%;
+    left: 80%;
+}
+
+.container_TextoEstado{
+    position: absolute;
+    width: 200px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Contraseña */
+.container_Contraseña{
+    position: absolute;
+    width: 302px;
+    height: 80px;
+    top: 60%;
+    left: 44.6%;
+}
+
+.container_TextoContraseña{
+    position: absolute;
+    width: 280px;
+    height: 40px;
+    top: 40%;
+    left: 2%;
+
+    border-radius: 15px;
+    background-color: white;
+}
+
+/* Confirmar contraseña */
+.container_ConfContraseña{
+    position: absolute;
+    width: 302px;
+    height: 80px;
+    top: 60%;
+    left: 72.3%;
+}
+
+/* Términos y condiciones */
+.container_TeryCond{
+    position: absolute;
+    width: 302px;
+    height: 70px;
+    top: 76%;
+    left: 61%;
+}
+
+/* Botón de aceptar */
+.button_aceptar{
+    position: absolute;
+    width: 50px;
+    height: 35px;
+    left: 5%;
+    top: 31%;
+}
+
+.button_aceptar i {
+    font-size: 35px;
+    color: #3046CF;
+}
+
+.button_aceptar:has(input:checked) i {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    content: "\f14a";
+}
+
+.texto_Terminos{
+    position: absolute;
+    left: 18%;
+    top: 32%;
+
+    color: #3046CF;
+    font-size: 18px;
+    font-weight: 500;
+}
+
+/* Botón de crear una cuenta */
+.container_Button{
+    position: absolute;
+    width: 302px;
+    height: 70px;
+    top: 86%;
+    left: 60%;
+}
+
+.button{
+    position: absolute;
+    width: 180px;
+    height: 50px;
+    top: 33vh;
+    left: 5%;
+
+    border-radius: 20px;
+    background-color: #3046CF;
+}
+
+.texto_Button{
+    position: absolute;
+    left: 22%;
+    top: 15%;
+
+    color: #FFFFFF;
+    font-size: 20px;
+    font-weight: 600;
+}
+
