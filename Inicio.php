@@ -9,7 +9,6 @@ $nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
 error_log("Datos de sesión: " . print_r($_SESSION, true));
 ?>
 
-
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -39,24 +38,28 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         </section>
 
         <!-- Botones de sesión (cuando NO hay usuario logueado) -->
-        <div class="auth_buttons" id="sessionButtons">
-            <a href="InicioSesion.html" class="button_LogIn">
-                <span class="text_Button">Log In</span>                
-            </a>
-            <a href="Registro.html" class="button_SignIn">
-                <span class="text_Button">Sign In</span>
-            </a>
-        </div>
+            <?php if (!$usuarioLogueado): ?>
+            <!-- Botones de sesión -->
+            <div class="auth_buttons" id="sessionButtons">
+                <a href="InicioSesion.html" class="button_LogIn">
+                    <span class="text_Button">Log In</span>                
+                </a>
+                <a href="Registro.html" class="button_SignIn">
+                    <span class="text_Button">Sign In</span>
+                </a>
+            </div>
+        <?php else: ?>
+            <!-- Botones de usuario -->
+            <div class="user_actions" id="userButtons">
+                <a href="BolsaCompra.html" class="button_Buy">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </a>
+                <a href="Perfil.html" class="button_User">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </div>
+        <?php endif; ?>
 
-        <!-- Botones de usuario (cuando SÍ hay usuario logueado) -->
-        <div class="user_actions" id="userButtons" style="display: none;">
-            <a href="BolsaCompra.html" class="button_Buy">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </a>
-            <a href="Perfil.html" class="button_User">
-                <i class="fa-solid fa-user"></i>
-            </a>
-        </div>
     </header>
 
     <!-- La barra de navegación -->
@@ -195,23 +198,22 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-        // Verificar si hay un usuario logueado (ejemplo con localStorage)
-        const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-        
-        const sessionButtons = document.getElementById('sessionButtons');
-        const userButtons = document.getElementById('userButtons');
-        
-        if (usuarioLogueado) {
-            // Ocultar botones de sesión y mostrar botones de usuario
-            sessionButtons.style.display = 'none';
-            userButtons.style.display = 'flex';
-        } else {
-            // Asegurarse que los botones de usuario están ocultos
-            userButtons.style.display = 'none';
-            sessionButtons.style.display = 'flex';
-        }
-    });
-
+            // Verificar si hay un usuario logueado (ejemplo con localStorage)
+            const usuarioLogueado = localStorage.getItem('usuarioLogueado');
+            
+            const sessionButtons = document.getElementById('sessionButtons');
+            const userButtons = document.getElementById('userButtons');
+            
+            if (usuarioLogueado) {
+                // Ocultar botones de sesión y mostrar botones de usuario
+                sessionButtons.style.display = 'none';
+                userButtons.style.display = 'flex';
+            } else {
+                // Asegurarse que los botones de usuario están ocultos
+                userButtons.style.display = 'none';
+                sessionButtons.style.display = 'flex';
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', function() {
             // Configuración del modal de historia

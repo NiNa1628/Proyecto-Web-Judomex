@@ -1,21 +1,164 @@
+<?php
+session_start();
+
+// Conexión a la base de datos
+$host = 'localhost';
+$dbname = 'judomex';
+$username = 'tu_usuario';
+$password = 'tu_contraseña';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    die("Error de conexión: " . $e->getMessage());
+}
+
+// Verificar sesión
+$usuarioLogueado = isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != '';
+$nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
+
+// Obtener productos por categoría
+function obtenerProductosPorCategoria($pdo, $categoria) {
+    $stmt = $pdo->prepare("SELECT * FROM productos WHERE categoria = ?");
+    $stmt->execute([$categoria]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Obtener tallas y stock para un producto
+function obtenerTallasStock($pdo, $producto_id) {
+    $stmt = $pdo->prepare("
+        SELECT t.talla, s.cantidad 
+        FROM stock s
+        JOIN tallas t ON s.talla_id = t.id
+        WHERE s.producto_id = ?
+    ");
+    $stmt->execute([$producto_id]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+// Procesar añadir al carrito
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
+    if (!$usuarioLogueado) {
+        header("Location: InicioSesion.html");
+        exit;
+    }
+    
+    // Aquí iría la lógica para añadir al carrito
+    // ...
+}
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Judomex</title>
+    <title>Judomex - Equipo</title>
     <link rel="website icon" type="png" href="assets/logo.png">
     <link rel="stylesheet" href="Equipo.css" type="text/css"/>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        /* Estilos para el modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+        }
+        
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 600px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .modal-image-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 5px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: #333;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group select, 
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .add-to-cart {
+            background-color: #3046CF;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        
+        .add-to-cart:hover {
+            background-color: #2337a8;
+        }
+        
+        .stock-info {
+            margin-top: 5px;
+            font-size: 14px;
+            color: #28a745;
+        }
+        
+        .stock-info.out-of-stock {
+            color: #dc3545;
+        }
+    </style>
+    <script>
+        // Objeto global para almacenar stock
+        const productsDB = {};
+    </script>
 </head>
-<body>
-    <!-- Es la parte de la cabecera -->
+<body class="<?php echo $usuarioLogueado ? 'logged-in' : ''; ?>">
     <header class="header">
         <div class="logo">
-                <img src="assets/logo.png" alt="Logo">
+            <img src="assets/logo.png" alt="Logo">
         </div>
-
+        
         <div class="judomex_titulo">
             <judomex_titulo>JUDOMEX</judomex_titulo>
         </div>
@@ -27,8 +170,8 @@
             </div>
         </section>
 
-        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
-        <div class="auth_buttons" id="sessionButtons">
+        <!-- Botones de sesión -->
+        <div class="auth_buttons" id="sessionButtons" style="<?php echo $usuarioLogueado ? 'display:none' : 'display:flex' ?>">
             <a href="InicioSesion.html" class="button_LogIn">
                 <span class="text_Button">Log In</span>                
             </a>
@@ -37,8 +180,8 @@
             </a>
         </div>
 
-        <!-- Botones de usuario (cuando SÍ hay usuario logueado) -->
-        <div class="user_actions" id="userButtons" style="display: none;">
+        <!-- Botones de usuario -->
+        <div class="user_actions" id="userButtons" style="<?php echo $usuarioLogueado ? 'display:flex' : 'display:none' ?>">
             <a href="BolsaCompra.html" class="button_Buy">
                 <i class="fa-solid fa-bag-shopping"></i>
             </a>
@@ -48,33 +191,28 @@
         </div>
     </header>
 
-    <!-- La barra de navegación -->
+    <!-- Barra de navegación -->
     <section class="bar_buttons">
-        <!-- Botón de Inicio -->
         <a href="Inicio.php" class="nav-link">
             <div class="noSelect_Button">
                 <span class="noSeleccionado">Inicio</span>
             </div>
         </a>
-        <!-- Botón de Equipo -->
         <a href="Equipo.php" class="nav-link">
             <div class="select_Button">
                 <span class="seleccionado">Equipo</span>
             </div>
         </a>
-        <!-- Botón de Academia -->
         <a href="Academia.php" class="nav-link">
             <div class="noSelect_Button">
                 <span class="noSeleccionado">Academia</span>
             </div>
         </a>
-        <!-- Botón de Entrenamiento -->
         <a href="Entrenamiento.php" class="nav-link">
             <div class="noSelect_Button">
                 <span class="noSeleccionado">Entrenamiento</span>
             </div>
         </a>
-        <!-- Botón de Competencia -->
         <a href="Competencia.php" class="nav-link">
             <div class="noSelect_Button">
                 <span class="noSeleccionado">Competencia</span>
@@ -82,160 +220,115 @@
         </a>
     </section>
 
-    <!-- Venta de Judogis -->
+    <!-- Sección de Judogis -->
     <section class="bar_judogi">
         <div class="container_texto">
             <span class="texto_Seccion">Judogi</span>
         </div>
-        <div class="product-card" onclick="showProductDetail('Judogi Blanco Outshock', '1200.00', 'assets/jud1.jpg', 'Judogi de alta calidad para competición')">
-            <div class="product-image" style="background-image: url('assets/jud1.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Judogi Blanco <br>Outshock</h3>
-                <p class="product-price">$1200.00 mxn</p>
+        <?php
+        $judogis = obtenerProductosPorCategoria($pdo, 'judogi');
+        foreach ($judogis as $producto): 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
             </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Judogi Blanco Mizuno', '7800.00', 'assets/jud2.jpg', 'Judogi oficial para torneos')">
-            <div class="product-image" style="background-image: url('assets/jud2.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Judogi Blanco <br>Mizuno</h3>
-                <p class="product-price">$7800.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Judogi Azul NKL', '920.00', 'assets/jud3.jpg', 'Judogi de alta calidad para competición')">
-            <div class="product-image" style="background-image: url('assets/jud3.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Judogi Azul <br>NKL</h3>
-                <p class="product-price">$920.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Judogi Blanco Adidas', '750.00', 'assets/jud4.jpg', 'Judogi de alta calidad para competición')">
-            <div class="product-image" style="background-image: url('assets/jud4.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Judogi Blanco <br>Adidas</h3>
-                <p class="product-price">$750.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Judogi Azul NKL', '860.00', 'assets/jud5.webp', 'Judogi de alta calidad para competición')">
-            <div class="product-image" style="background-image: url('assets/jud5.webp')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Judogi Azul <br>NKL</h3>
-                <p class="product-price">$860.00 mxn</p>
-            </div>
-        </div>
+        <?php endforeach; ?>
     </section>
 
-    <!-- Venta de cintas -->
+    <!-- Sección de Cintas -->
     <section class="bar_cintas">
         <div class="container_texto">
             <span class="texto_Seccion">Cintas</span>
         </div>
-        <div class="product-card" onclick="showProductDetail('Cinta Azul Fuji', '225.00', 'assets/cin1.jpg', 'Cinta de algodón resistente para grados kyu')">
-            <div class="product-image" style="background-image: url('assets/cin1.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Cinta Azul <br>Fuji</h3>
-                <p class="product-price">$225.00 mxn</p>
+        <?php
+        $cintas = obtenerProductosPorCategoria($pdo, 'cinta');
+        foreach ($cintas as $producto): 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
             </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Cinta Negra Japan Mizuno', '1440.00', 'assets/cin2.jpg', 'Cinta negra oficial Mizuno para danes')">
-            <div class="product-image" style="background-image: url('assets/cin2.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Cinta Negra <br>Japan Mizuno</h3>
-                <p class="product-price">$1440.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Cinta Naranja Mizuno', '560.00', 'assets/cin3.jpg', 'Cinta naranja de alta durabilidad')">
-            <div class="product-image" style="background-image: url('assets/cin3.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Cinta Naranja <br>Mizuno</h3>
-                <p class="product-price">$560.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Cinta Amarilla Fuji', '225.00', 'assets/cin4.jpg', 'Cinta amarilla para principiantes')">
-            <div class="product-image" style="background-image: url('assets/cin4.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Cinta Amarilla <br>Fuji</h3>
-                <p class="product-price">$225.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Cinta Roja Mizuno', '550.00', 'assets/cin5.png', 'Cinta roja para grados avanzados')">
-            <div class="product-image" style="background-image: url('assets/cin5.png')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Cinta Roja <br>Mizuno</h3>
-                <p class="product-price">$550.00 mxn</p>
-            </div>
-        </div>
+        <?php endforeach; ?>
     </section>
 
-    <!-- Venta de rodilleras -->
+    <!-- Sección de Rodilleras -->
     <section class="bar_rodilleras">
         <div class="container_texto">
             <span class="texto_Seccion">Rodilleras</span>
         </div>
-        <div class="product-card" onclick="showProductDetail('Rodilleras Negras Mizuno', '430.00', 'assets/rod1.jpg', 'Protección durable para entrenamiento')">
-            <div class="product-image" style="background-image: url('assets/rod1.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Rodilleras Negras <br>Mizuno</h3>
-                <p class="product-price">$430.00 mxn</p>
+        <?php
+        $rodilleras = obtenerProductosPorCategoria($pdo, 'rodillera');
+        foreach ($rodilleras as $producto): 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
             </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Rodilleras Rojas Mizuno', '670.00', 'assets/rod2.jpg', 'Rodilleras acolchadas para competencia')">
-            <div class="product-image" style="background-image: url('assets/rod2.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Rodilleras Rojas <br>Mizuno</h3>
-                <p class="product-price">$670.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Rodilleras Azules Mizuno', '490.00', 'assets/rod3.jpg', 'Protección ligera para dojo')">
-            <div class="product-image" style="background-image: url('assets/rod3.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Rodilleras Azules <br>Mizuno</h3>
-                <p class="product-price">$490.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Rodilleras Blancas Mizuno', '610.00', 'assets/rod4.jpg', 'Diseño ergonómico para máximo confort')">
-            <div class="product-image" style="background-image: url('assets/rod4.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Rodilleras Blancas <br>Mizuno</h3>
-                <p class="product-price">$610.00 mxn</p>
-            </div>
-        </div>
-        <div class="product-card" onclick="showProductDetail('Rodilleras VSI Negras Mizuno', '610.00', 'assets/rod5.jpg', 'Refuerzo lateral para mayor soporte')">
-            <div class="product-image" style="background-image: url('assets/rod5.jpg')"></div>
-            <div class="product-info">
-                <h3 class="product-name">Rodilleras VSI <br>Negras Mizuno</h3>
-                <p class="product-price">$610.00 mxn</p>
-            </div>
-        </div>
+        <?php endforeach; ?>
     </section>
 
-    <!-- Por si pongo créditos -->
-    <div class="container2">
-
-    </div>
+    <div class="container2"></div>
 
     <script>
-        // Base de datos de productos en JavaScript para el frontend
-        const productsDB = {
-            'Judogi Blanco Outshock': {
-                sizes: ['S', 'M', 'L', 'XL'],
-                stock: {
-                    'S': 5,
-                    'M': 8,
-                    'L': 6,
-                    'XL': 3
-                }
-            },
-            'Judogi Blanco Mizuno': {
-                sizes: ['S', 'M', 'L'],
-                stock: {
-                    'S': 3,
-                    'M': 4,
-                    'L': 2
-                }
-            },
-            // Agrega aquí el resto de productos con sus tallas y stock...
-        };
-
+        // Función para mostrar el modal de producto
         function showProductDetail(name, price, image, description) {
             // Cerrar cualquier modal existente primero
             const existingModal = document.getElementById('productModal');
@@ -246,7 +339,7 @@
             // Obtener información del producto
             const product = productsDB[name] || {
                 sizes: ['Única'],
-                stock: {'Única': 10} // Valor por defecto para productos sin talla
+                stock: {'Única': 10}
             };
             
             // Crear opciones de talla
@@ -261,7 +354,7 @@
             modal.id = 'productModal';
             modal.className = 'modal';
             
-            // Contenido del modal con imagen centrada
+            // Contenido del modal
             modal.innerHTML = `
                 <div class="modal-content">
                     <span class="close" onclick="closeModal()">&times;</span>
@@ -312,6 +405,7 @@
             };
         }
         
+        // Actualizar información de stock
         function updateStockInfo(productName, size) {
             const product = productsDB[productName];
             const stockInfo = document.getElementById('stockInfo');
@@ -328,6 +422,11 @@
                     if (quantityInput.value > stock) {
                         quantityInput.value = stock;
                     }
+                    
+                    // Habilitar botón si estaba deshabilitado
+                    const addButton = document.querySelector('.add-to-cart');
+                    addButton.disabled = false;
+                    addButton.style.opacity = '1';
                 } else {
                     stockInfo.textContent = 'Agotado';
                     stockInfo.className = 'stock-info out-of-stock';
@@ -342,11 +441,12 @@
             }
         }
 
+        // Cerrar modal
         function closeModal() {
             const modal = document.getElementById('productModal');
             if (modal) {
                 modal.style.display = 'none';
-                modal.remove(); // Esto elimina el modal del DOM completamente
+                modal.remove();
             }
         }
 
@@ -356,25 +456,7 @@
             if (event.target == modal) {
                 closeModal();
             }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-        // Verificar si hay un usuario logueado (ejemplo con localStorage)
-        const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-        
-        const sessionButtons = document.getElementById('sessionButtons');
-        const userButtons = document.getElementById('userButtons');
-        
-        if (usuarioLogueado) {
-            // Ocultar botones de sesión y mostrar botones de usuario
-            sessionButtons.style.display = 'none';
-            userButtons.style.display = 'flex';
-        } else {
-            // Asegurarse que los botones de usuario están ocultos
-            userButtons.style.display = 'none';
-            sessionButtons.style.display = 'flex';
-        }
-    });
+        };
     </script>
 </body>
 </html>

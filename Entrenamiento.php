@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Verificar sesión - FORMA CORRECTA
+$usuarioLogueado = isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != '';
+$nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
+
+// Para depuración (puedes quitarlo después)
+error_log("Datos de sesión: " . print_r($_SESSION, true));
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -9,13 +20,12 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     </head>
-<body>
-    <!-- Es la parte de la cabecera -->
+<body class="<?php echo $usuarioLogueado ? 'logged-in' : ''; ?>">
     <header class="header">
         <div class="logo">
-                <img src="assets/logo.png" alt="Logo">
+            <img src="assets/logo.png" alt="Logo">
         </div>
-
+        
         <div class="judomex_titulo">
             <judomex_titulo>JUDOMEX</judomex_titulo>
         </div>
@@ -1002,7 +1012,7 @@
                 }
             });
         });
-    });
+        });
 
     </script>
 
@@ -1010,24 +1020,5 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <!-- Bootstrap 5 JS Bundle con Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Verificar si hay un usuario logueado (ejemplo con localStorage)
-        const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-        
-        const sessionButtons = document.getElementById('sessionButtons');
-        const userButtons = document.getElementById('userButtons');
-        
-        if (usuarioLogueado) {
-            // Ocultar botones de sesión y mostrar botones de usuario
-            sessionButtons.style.display = 'none';
-            userButtons.style.display = 'flex';
-        } else {
-            // Asegurarse que los botones de usuario están ocultos
-            userButtons.style.display = 'none';
-            sessionButtons.style.display = 'flex';
-        }
-    });
-</script>
 </body>
 </html>

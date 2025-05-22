@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Verificar sesión - FORMA CORRECTA
+$usuarioLogueado = isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != '';
+$nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
+
+// Para depuración (puedes quitarlo después)
+error_log("Datos de sesión: " . print_r($_SESSION, true));
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -5,178 +16,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Judomex - Ubicación</title>
     <link rel="website icon" type="png" href="assets/logo.png">
-    <link rel="stylesheet" href="Academia.css" type="text/css"/>
+    <link rel="stylesheet" href="css/academia.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        /* Estilos mejorados para el mapa */
-        #map {
-            height: 300px;
-            width: 100%;
-            margin: 10px 0;
-            border-radius: 12px;
-            border: 2px solid #e0e0e0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
-        }
-        
-        #map:hover {
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-        
-        .location-container {
-            background: #f5f7fa;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-            top: 19vh;
-            width: 90%;
-            left: 5%;
-            position: absolute;
-            border: 1px solid rgb(210, 209, 209);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-        }
-        
-        .location-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-            color: #2c3e50;
-        }
-        
-        .location-header i {
-            font-size: 24px;
-            margin-right: 12px;
-            color: #FE0000;
-        }
-        
-        .location-info {
-            background-color: white;
-            padding: 5px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-        }
-        
-        .info-item {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            font-size: 15px;
-        }
-        
-        .info-item i {
-            width: 24px;
-            text-align: center;
-            margin-right: 10px;
-            color: #3046CF;
-        }
-        
-        .btn-location {
-            background: linear-gradient(135deg, #3046CF 0%, #2980b9 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-location:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-            background: linear-gradient(135deg, #3046CF 0%, #3046CF 100%);
-        }
-        
-        .btn-location i {
-            margin-right: 8px;
-        }
-        
-        .btn-reload {
-            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
-            margin-left: 12px;
-        }
-        
-        .btn-reload:hover {
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
-        }
-        
-        /* Estilo para el marcador personalizado */
-        .custom-marker {
-            background-color: #e74c3c;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border: 3px solid white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-        }
-
-        .academias{
-            position: absolute;
-            width: 90%;
-            height: 90px;
-            top: 102vh;
-            left:5%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            background: #f8f9fa;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .academia-card {
-            background: white;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            transition: transform 0.3s ease;
-            border-left: 4px solid #3046CF;
-            cursor: pointer;
-        }
-
-        .academia-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 6px 16px rgba(0,0,0,0.15);
-        }
-
-        .academia-card h3 {
-            color: #3046CF;
-            margin-top: 0;
-            margin-bottom: 6px;
-            font-size: 16px;
-        }
-
-        .academia-card p {
-            color: #555;
-            line-height: 1.6;
-            margin: 0;
-            font-size: 12px;
-        }
-
-        /* Por si pongo créditos */
-        .container2 {
-            width: 100%;
-            height: 33px;
-            margin-top: 23vh;
-            background: #3046CF;
-        }
-    </style>
 </head>
-<body>
-    <!-- Es la parte de la cabecera -->
+<body class="<?php echo $usuarioLogueado ? 'logged-in' : ''; ?>">
     <header class="header">
         <div class="logo">
-                <img src="assets/logo.png" alt="Logo">
+            <img src="assets/logo.png" alt="Logo">
         </div>
-
+        
         <div class="judomex_titulo">
             <judomex_titulo>JUDOMEX</judomex_titulo>
         </div>
@@ -600,22 +450,22 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-        // Verificar si hay un usuario logueado (ejemplo con localStorage)
-        const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-        
-        const sessionButtons = document.getElementById('sessionButtons');
-        const userButtons = document.getElementById('userButtons');
-        
-        if (usuarioLogueado) {
-            // Ocultar botones de sesión y mostrar botones de usuario
-            sessionButtons.style.display = 'none';
-            userButtons.style.display = 'flex';
-        } else {
-            // Asegurarse que los botones de usuario están ocultos
-            userButtons.style.display = 'none';
-            sessionButtons.style.display = 'flex';
-        }
-    });
+            // Verificar si hay un usuario logueado (ejemplo con localStorage)
+            const usuarioLogueado = localStorage.getItem('usuarioLogueado');
+            
+            const sessionButtons = document.getElementById('sessionButtons');
+            const userButtons = document.getElementById('userButtons');
+            
+            if (usuarioLogueado) {
+                // Ocultar botones de sesión y mostrar botones de usuario
+                sessionButtons.style.display = 'none';
+                userButtons.style.display = 'flex';
+            } else {
+                // Asegurarse que los botones de usuario están ocultos
+                userButtons.style.display = 'none';
+                sessionButtons.style.display = 'flex';
+            }
+        });
     </script>
 </body>
 </html>

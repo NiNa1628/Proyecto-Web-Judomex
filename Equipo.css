@@ -86,7 +86,7 @@ body{
     color: rgba(48, 69, 207, 0.804);
 }
 
-/* Botón de compra */
+/* Botón de búsqueda */
 .button_Search{
     position: absolute;
     width: 50px;
@@ -101,20 +101,22 @@ body{
 }
 
 /* Contenedor de botones */
-.auth_buttons {
-    position: absolute;
-    right: 180px;
-    top: 20px;
-    display: flex;
-    gap: 10px;
-}
-
 .user_actions {
-    position: absolute;
+    position: fixed;
     right: 60px;
     top: 22px;
     display: none;
     gap: 15px;
+    align-items: center;
+    z-index: 1000;
+}
+
+.auth_buttons {
+    position: fixed;
+    right: 180px;
+    top: 20px;
+    display: flex;
+    gap: 10px;
 }
 
 /* Botones de autenticación */
@@ -130,6 +132,10 @@ body{
     text-decoration: none;
 }
 
+body.logged-in .user_actions {
+    display: flex !important;
+}
+
 .text_Button {
     font-weight: 600;
     font-size: 16px;
@@ -137,32 +143,26 @@ body{
 }
 
 /* Botón de compra */
-.button_Buy {
-    position: relative;
-    width: 40px;
-    height: 40px;
+.button_Buy, .button_User {
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-.button_Buy i {
-    font-size: 30px;
+    width: 40px;
+    height: 40px;
+    background: #333;
+    border-radius: 50%;
     color: white;
+    text-decoration: none;
+    transition: all 0.3s ease;
 }
 
-/* Botón de usuario */
-.button_User {
-    position: relative;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.button_Buy:hover, .button_User:hover {
+    background: #555;
+    transform: scale(1.05);
 }
 
-.button_User i {
-    font-size: 30px;
+.button_Buy i, .button_User i {
+    font-size: 20px;
     color: white;
 }
 
