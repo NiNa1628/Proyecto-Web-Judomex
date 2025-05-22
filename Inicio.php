@@ -198,24 +198,6 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Verificar si hay un usuario logueado (ejemplo con localStorage)
-            const usuarioLogueado = localStorage.getItem('usuarioLogueado');
-            
-            const sessionButtons = document.getElementById('sessionButtons');
-            const userButtons = document.getElementById('userButtons');
-            
-            if (usuarioLogueado) {
-                // Ocultar botones de sesión y mostrar botones de usuario
-                sessionButtons.style.display = 'none';
-                userButtons.style.display = 'flex';
-            } else {
-                // Asegurarse que los botones de usuario están ocultos
-                userButtons.style.display = 'none';
-                sessionButtons.style.display = 'flex';
-            }
-        });
-
-        document.addEventListener('DOMContentLoaded', function() {
             // Configuración del modal de historia
             const extendedDesc = document.querySelector('#window-notice-historia .extended-description');
             if (extendedDesc) extendedDesc.style.display = 'none';

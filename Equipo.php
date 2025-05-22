@@ -1,14 +1,14 @@
 <?php
 session_start();
 
-// Conexión a la base de datos
-$host = 'localhost';
-$dbname = 'judomex';
-$username = 'tu_usuario';
-$password = 'tu_contraseña';
+// Configuración de la base de datos
+$host = "localhost";
+$usuario = "root";
+$contrasena = "";
+$base_datos = "judomex";
 
 try {
-    $pdo = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    $pdo = new PDO("mysql:host=$host;dbname=$base_datos", $usuario, $contrasena);
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch (PDOException $e) {
     die("Error de conexión: " . $e->getMessage());
@@ -17,35 +17,39 @@ try {
 // Verificar sesión
 $usuarioLogueado = isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != '';
 $nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
+?>
 
-// Obtener productos por categoría
+<?php
+// Función para obtener productos por categoría
 function obtenerProductosPorCategoria($pdo, $categoria) {
     $stmt = $pdo->prepare("SELECT * FROM productos WHERE categoria = ?");
     $stmt->execute([$categoria]);
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
-// Obtener tallas y stock para un producto
+// Función para obtener las tallas disponibles y stock de un producto
 function obtenerTallasStock($pdo, $producto_id) {
-    $stmt = $pdo->prepare("
+    // Primero obtenemos la categoría del producto para saber qué tipo de tallas buscar
+    $stmt = $pdo->prepare("SELECT categoria FROM productos WHERE id = ?");
+    $stmt->execute([$producto_id]);
+    $producto = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+    if (!$producto) return [];
+    
+    // Determinamos el tipo de talla según la categoría
+    $tipo_talla = ($producto['categoria'] == 'judogi' || $producto['categoria'] == 'rodillera') ? 'ropa' : 'cinta';
+    
+    // Obtenemos las tallas disponibles para este producto con su stock
+    $query = "
         SELECT t.talla, s.cantidad 
         FROM stock s
         JOIN tallas t ON s.talla_id = t.id
-        WHERE s.producto_id = ?
-    ");
-    $stmt->execute([$producto_id]);
-    return $stmt->fetchAll(PDO::FETCH_ASSOC);
-}
-
-// Procesar añadir al carrito
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
-    if (!$usuarioLogueado) {
-        header("Location: InicioSesion.html");
-        exit;
-    }
+        WHERE s.producto_id = ? AND t.tipo = ?
+    ";
     
-    // Aquí iría la lógica para añadir al carrito
-    // ...
+    $stmt = $pdo->prepare($query);
+    $stmt->execute([$producto_id, $tipo_talla]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 ?>
 
@@ -148,10 +152,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
             color: #dc3545;
         }
     </style>
-    <script>
-        // Objeto global para almacenar stock
-        const productsDB = {};
-    </script>
 </head>
 <body class="<?php echo $usuarioLogueado ? 'logged-in' : ''; ?>">
     <header class="header">
@@ -170,25 +170,29 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
             </div>
         </section>
 
-        <!-- Botones de sesión -->
-        <div class="auth_buttons" id="sessionButtons" style="<?php echo $usuarioLogueado ? 'display:none' : 'display:flex' ?>">
-            <a href="InicioSesion.html" class="button_LogIn">
-                <span class="text_Button">Log In</span>                
-            </a>
-            <a href="Registro.html" class="button_SignIn">
-                <span class="text_Button">Sign In</span>
-            </a>
-        </div>
+        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
+            <?php if (!$usuarioLogueado): ?>
+            <!-- Botones de sesión -->
+            <div class="auth_buttons" id="sessionButtons">
+                <a href="InicioSesion.html" class="button_LogIn">
+                    <span class="text_Button">Log In</span>                
+                </a>
+                <a href="Registro.html" class="button_SignIn">
+                    <span class="text_Button">Sign In</span>
+                </a>
+            </div>
+        <?php else: ?>
+            <!-- Botones de usuario -->
+            <div class="user_actions" id="userButtons">
+                <a href="BolsaCompra.html" class="button_Buy">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </a>
+                <a href="Perfil.html" class="button_User">
+                    <i class="fa-solid fa-user"></i>
+                </a>
+            </div>
+        <?php endif; ?>
 
-        <!-- Botones de usuario -->
-        <div class="user_actions" id="userButtons" style="<?php echo $usuarioLogueado ? 'display:flex' : 'display:none' ?>">
-            <a href="BolsaCompra.html" class="button_Buy">
-                <i class="fa-solid fa-bag-shopping"></i>
-            </a>
-            <a href="Perfil.html" class="button_User">
-                <i class="fa-solid fa-user"></i>
-            </a>
-        </div>
     </header>
 
     <!-- Barra de navegación -->
@@ -219,6 +223,118 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
             </div>
         </a>
     </section>
+
+    <!-- Sección de Judogis -->
+    <!--<section class="bar_judogi">
+        <div class="container_texto">
+            <span class="texto_Seccion">Judogi</span>
+        </div>
+    </section>-->
+
+    <!-- Sección de Judogis - Versión corregida -->
+    <section class="bar_judogi">
+        <div class="container_texto">
+            <span class="texto_Seccion">Judogi</span>
+        </div>
+        <?php
+        $judogis = obtenerProductosPorCategoria($pdo, 'judogi');
+        foreach ($judogis as $producto) { 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
+            </div>
+        <?php } ?>
+    </section>
+
+    <!-- Sección de Cintas -->
+    <!--<section class="bar_cintas">
+        <div class="container_texto">
+            <span class="texto_Seccion">Cintas</span>
+        </div>
+        <?php
+        $cintas = obtenerProductosPorCategoria($pdo, 'cinta');
+        foreach ($cintas as $producto): 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </section>-->
+
+    <!-- Sección de Rodilleras -->
+    <!--<section class="bar_rodilleras">
+        <div class="container_texto">
+            <span class="texto_Seccion">Rodilleras</span>
+        </div>
+        <?php
+        $rodilleras = obtenerProductosPorCategoria($pdo, 'rodillera');
+        foreach ($rodilleras as $producto): 
+            $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+            $stockData = [];
+            foreach ($tallasStock as $ts) {
+                $stockData[$ts['talla']] = $ts['cantidad'];
+            }
+        ?>
+            <script>
+                productsDB['<?= $producto['nombre'] ?>'] = {
+                    sizes: <?= json_encode(array_column($tallasStock, 'talla')) ?>,
+                    stock: <?= json_encode($stockData) ?>
+                };
+            </script>
+            <div class="product-card" onclick="showProductDetail(
+                '<?= $producto['nombre'] ?>', 
+                '<?= $producto['precio'] ?>', 
+                '<?= $producto['imagen'] ?>', 
+                '<?= addslashes($producto['descripcion']) ?>'
+            )">
+                <div class="product-image" style="background-image: url('<?= $producto['imagen'] ?>')"></div>
+                <div class="product-info">
+                    <h3 class="product-name"><?= str_replace(' ', '<br>', $producto['nombre']) ?></h3>
+                    <p class="product-price">$<?= number_format($producto['precio'], 2) ?> mxn</p>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    </section>-->
 
     <!-- Sección de Judogis -->
     <section class="bar_judogi">
@@ -328,6 +444,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['add_to_cart'])) {
     <div class="container2"></div>
 
     <script>
+         var productsDB = {};
+
         // Función para mostrar el modal de producto
         function showProductDetail(name, price, image, description) {
             // Cerrar cualquier modal existente primero
