@@ -27,6 +27,76 @@ if (!$usuario) {
     die("Usuario no encontrado");
 }
 
+// Procesar cambio de foto de perfil
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_foto'])) {
+    $nuevaFoto = $_POST['foto_seleccionada'] ?? '';
+    $fotosPermitidas = ['assets/hombre.png', 'assets/hombre2.png', 'assets/mujer1.png', 'assets/mujer2.png'];
+    
+    if (in_array($nuevaFoto, $fotosPermitidas)) {
+        // Actualizar en la base de datos (asumiendo que tienes un campo 'foto_perfil')
+        $stmt = $pdo->prepare("UPDATE usuarios SET foto_perfil = ? WHERE id_usuario = ?");
+        $stmt->execute([$nuevaFoto, $_SESSION['usuario_id']]);
+        
+        // Actualizar en la sesión
+        $_SESSION['foto_perfil'] = $nuevaFoto;
+        $usuario['foto_perfil'] = $nuevaFoto;
+        
+        // Redirigir para evitar reenvío del formulario
+        header("Location: Perfil.php");
+        exit();
+    }
+}
+
+// Procesar edición de perfil
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar_perfil'])) {
+    $datosActualizados = [
+        'nombre' => $_POST['nombre'] ?? $usuario['nombre'],
+        'apellidos' => $_POST['apellidos'] ?? $usuario['apellidos'],
+        'email' => $_POST['email'] ?? $usuario['email'],
+        'telefono' => $_POST['telefono'] ?? $usuario['telefono'],
+        'fecha_nacimiento' => $_POST['fecha_nacimiento'] ?? $usuario['fecha_nacimiento'],
+        'genero' => $_POST['genero'] ?? $usuario['genero'],
+        'calle' => $_POST['calle'] ?? $usuario['calle'],
+        'no_ext' => $_POST['no_ext'] ?? $usuario['no_ext'],
+        'no_int' => $_POST['no_int'] ?? $usuario['no_int'],
+        'colonia' => $_POST['colonia'] ?? $usuario['colonia'],
+        'cp' => $_POST['cp'] ?? $usuario['cp'],
+        'pais' => $_POST['pais'] ?? $usuario['pais'],
+        'estado' => $_POST['estado'] ?? $usuario['estado'],
+        'id_usuario' => $_SESSION['usuario_id']
+    ];
+    
+    try {
+        $stmt = $pdo->prepare("UPDATE usuarios SET 
+            nombre = :nombre,
+            apellidos = :apellidos,
+            email = :email,
+            telefono = :telefono,
+            fecha_nacimiento = :fecha_nacimiento,
+            genero = :genero,
+            calle = :calle,
+            no_ext = :no_ext,
+            no_int = :no_int,
+            colonia = :colonia,
+            cp = :cp,
+            pais = :pais,
+            estado = :estado
+            WHERE id_usuario = :id_usuario");
+        
+        $stmt->execute($datosActualizados);
+        
+        // Actualizar datos en sesión
+        $_SESSION['usuario_nombre'] = $datosActualizados['nombre'];
+        
+        // Redirigir para evitar reenvío del formulario
+        header("Location: Perfil.php");
+        exit();
+        
+    } catch (PDOException $e) {
+        $errorEdicion = "Error al actualizar el perfil: " . $e->getMessage();
+    }
+}
+
 // Función para formatear fecha
 function formatFecha($fecha) {
     if (empty($fecha)) return 'No especificada';
@@ -50,13 +120,12 @@ function formatFecha($fecha) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perfil de Usuario</title>
+    <title>Judomex</title>
     <link rel="website icon" type="png" href="assets/logo.png">
     <link rel="stylesheet" href="Equipo.css" type="text/css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>        
+    <style>
         .profile-container {
             position: absolute;
             display: flex;
@@ -174,6 +243,90 @@ function formatFecha($fecha) {
         .logout-btn:hover {
             background: #bb2d3b;
         }
+        
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 8px;
+        }
+        
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .close:hover {
+            color: black;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        
+        .photo-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .photo-option {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .photo-option:hover {
+            border-color: #3046CF;
+        }
+        
+        .photo-option.selected {
+            border-color: #3046CF;
+            box-shadow: 0 0 10px rgba(48, 70, 207, 0.5);
+        }
+        
+        .photo-option img {
+            width:55%;
+            height: 100%;
+            object-fit: contain;
+        }
     </style>
 </head>
 <body class="<?php echo $usuarioLogueado ? 'logged-in' : ''; ?>">
@@ -193,23 +346,20 @@ function formatFecha($fecha) {
             </div>
         </section>
 
-        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
-            <?php if ($usuarioLogueado): ?>
-            <!-- Botones de usuario -->
+        <?php if ($usuarioLogueado): ?>
             <div class="user_actions" id="userButtons">
                 <a href="BolsaCompra.php" class="button_Buy">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </a>
             </div>
         <?php endif; ?>
-
     </header>
 
     <div class="profile-container">
         <!-- Sección de foto de perfil -->
         <div class="profile-picture">
-            <img src="assets/<?php echo strtolower($usuario['genero']) === 'mujer' ? 'mujer.png' : 'hombre.png'; ?>" alt="Foto de perfil" class="profile-img">
-            <button class="upload-btn">Cambiar foto</button>
+            <img src="assets/<?php echo htmlspecialchars($usuario['foto_perfil'] ?? (strtolower($usuario['genero']) === 'mujer' ? 'mujer.png' : 'hombre.png')); ?>" alt="Foto de perfil" class="profile-img">
+            <button class="upload-btn" id="openPhotoModal">Cambiar foto</button>
             
             <div style="margin-top: 30px;">
                 <h3 style="color: #3046CF; margin-bottom: 10px;">Miembro desde:</h3>
@@ -294,14 +444,181 @@ function formatFecha($fecha) {
             </div>
             
             <div class="action-buttons">
-                <button class="edit-btn" onclick="location.href='editar-perfil.php'">
+                <button class="edit-btn" id="openEditModal">
                     <i class="fas fa-edit"></i> Editar Perfil
                 </button>
-                <button class="logout-btn" onclick="location.href='logout.php'">
+                <button class="logout-btn" onclick="location.href='InicioSesion.php'">
                     <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </button>
             </div>
         </div>
     </div>
+
+    <!-- Modal para cambiar foto -->
+    <div id="photoModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Selecciona una nueva foto de perfil</h2>
+            <form method="post" action="Perfil.php">
+                <div class="photo-options">
+                    <label class="photo-option">
+                        <input type="radio" name="foto_seleccionada" value=".png" <?php echo ($usuario['foto_perfil'] ?? 'hombre.png') === 'hombre.png' ? 'checked' : ''; ?>>
+                        <img src="assets/hombre.png" alt="Hombre 1">
+                    </label>
+                    <label class="photo-option">
+                        <input type="radio" name="foto_seleccionada" value="hombre2.png" <?php echo ($usuario['foto_perfil'] ?? 'hombre.png') === 'hombre2.png' ? 'checked' : ''; ?>>
+                        <img src="assets/hombre2.png" alt="Hombre 2">
+                    </label>
+                    <label class="photo-option">
+                        <input type="radio" name="foto_seleccionada" value="mujer.png" <?php echo ($usuario['foto_perfil'] ?? 'hombre.png') === 'mujer.png' ? 'checked' : ''; ?>>
+                        <img src="assets/mujer.png" alt="Mujer 1">
+                    </label>
+                    <label class="photo-option">
+                        <input type="radio" name="foto_seleccionada" value="mujer2.png" <?php echo ($usuario['foto_perfil'] ?? 'hombre.png') === 'mujer2.png' ? 'checked' : ''; ?>>
+                        <img src="assets/mujer2.png" alt="Mujer 2">
+                    </label>
+                </div>
+                <button type="submit" name="cambiar_foto" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal para editar perfil -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Editar Perfil</h2>
+            <?php if (isset($errorEdicion)): ?>
+                <div class="alert alert-danger"><?php echo $errorEdicion; ?></div>
+            <?php endif; ?>
+            
+            <form method="post" action="Perfil.php">
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" id="nombre" name="nombre" value="<?php echo htmlspecialchars($usuario['nombre']); ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="apellidos">Apellidos:</label>
+                    <input type="text" id="apellidos" name="apellidos" value="<?php echo htmlspecialchars($usuario['apellidos']); ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Correo Electrónico:</label>
+                    <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($usuario['email']); ?>" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="telefono">Teléfono:</label>
+                    <input type="tel" id="telefono" name="telefono" value="<?php echo htmlspecialchars($usuario['telefono']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento:</label>
+                    <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" value="<?php echo htmlspecialchars($usuario['fecha_nacimiento']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="genero">Género:</label>
+                    <select id="genero" name="genero">
+                        <option value="Hombre" <?php echo $usuario['genero'] === 'Hombre' ? 'selected' : ''; ?>>Hombre</option>
+                        <option value="Mujer" <?php echo $usuario['genero'] === 'Mujer' ? 'selected' : ''; ?>>Mujer</option>
+                        <option value="Otro" <?php echo $usuario['genero'] === 'Otro' ? 'selected' : ''; ?>>Otro</option>
+                    </select>
+                </div>
+                
+                <h3 style="margin-top: 20px;">Dirección</h3>
+                
+                <div class="form-group">
+                    <label for="calle">Calle:</label>
+                    <input type="text" id="calle" name="calle" value="<?php echo htmlspecialchars($usuario['calle']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="no_ext">Número Exterior:</label>
+                    <input type="text" id="no_ext" name="no_ext" value="<?php echo htmlspecialchars($usuario['no_ext']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="no_int">Número Interior:</label>
+                    <input type="text" id="no_int" name="no_int" value="<?php echo htmlspecialchars($usuario['no_int']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="colonia">Colonia:</label>
+                    <input type="text" id="colonia" name="colonia" value="<?php echo htmlspecialchars($usuario['colonia']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="cp">Código Postal:</label>
+                    <input type="text" id="cp" name="cp" value="<?php echo htmlspecialchars($usuario['cp']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="pais">País:</label>
+                    <input type="text" id="pais" name="pais" value="<?php echo htmlspecialchars($usuario['pais']); ?>">
+                </div>
+                
+                <div class="form-group">
+                    <label for="estado">Estado:</label>
+                    <input type="text" id="estado" name="estado" value="<?php echo htmlspecialchars($usuario['estado']); ?>">
+                </div>
+                
+                <button type="submit" name="actualizar_perfil" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Manejo de los modales
+        const photoModal = document.getElementById('photoModal');
+        const editModal = document.getElementById('editModal');
+        const openPhotoBtn = document.getElementById('openPhotoModal');
+        const openEditBtn = document.getElementById('openEditModal');
+        const closeBtns = document.getElementsByClassName('close');
+        
+        // Abrir modal de foto
+        openPhotoBtn.onclick = function() {
+            photoModal.style.display = 'block';
+        }
+        
+        // Abrir modal de edición
+        openEditBtn.onclick = function() {
+            editModal.style.display = 'block';
+        }
+        
+        // Cerrar modales al hacer clic en la X
+        for (let i = 0; i < closeBtns.length; i++) {
+            closeBtns[i].onclick = function() {
+                photoModal.style.display = 'none';
+                editModal.style.display = 'none';
+            }
+        }
+        
+        // Cerrar modales al hacer clic fuera del contenido
+        window.onclick = function(event) {
+            if (event.target == photoModal) {
+                photoModal.style.display = 'none';
+            }
+            if (event.target == editModal) {
+                editModal.style.display = 'none';
+            }
+        }
+        
+        // Resaltar foto seleccionada
+        const photoOptions = document.querySelectorAll('.photo-option');
+        photoOptions.forEach(option => {
+            const radio = option.querySelector('input[type="radio"]');
+            if (radio.checked) {
+                option.classList.add('selected');
+            }
+            
+            option.addEventListener('click', () => {
+                photoOptions.forEach(opt => opt.classList.remove('selected'));
+                option.classList.add('selected');
+                radio.checked = true;
+            });
+        });
+    </script>
 </body>
 </html>

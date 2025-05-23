@@ -37,30 +37,27 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
             </div>
         </section>
 
-        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
-            <?php if (!$usuarioLogueado): ?>
-            <!-- Botones de sesión -->
+        <?php if (!$usuarioLogueado): ?>
             <div class="auth_buttons" id="sessionButtons">
-                <a href="InicioSesion.html" class="button_LogIn">
+                <a href="InicioSesion.php" class="button_LogIn">
                     <span class="text_Button">Log In</span>                
                 </a>
-                <a href="Registro.html" class="button_SignIn">
+                <a href="Registro.php" class="button_SignIn">
                     <span class="text_Button">Sign In</span>
                 </a>
             </div>
         <?php else: ?>
-            <!-- Botones de usuario -->
             <div class="user_actions" id="userButtons">
-                <a href="BolsaCompra.html" class="button_Buy">
+                <a href="BolsaCompra.php" class="button_Buy">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </a>
-                <a href="Perfil.html" class="button_User">
+                <a href="Perfil.php" class="button_User">
                     <i class="fa-solid fa-user"></i>
                 </a>
             </div>
         <?php endif; ?>
-
     </header>
+
     <!-- La barra de navegación -->
     <section class="bar_buttons">
         <!-- Botón de Inicio -->

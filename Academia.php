@@ -21,7 +21,7 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-    /* Estilos generales */
+        /* Estilos generales */
         body{
             position: relative;
             width: 100%;
@@ -195,7 +195,7 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
             width: 90%;
             height: 55px;
             left: 5%;
-            top: 13vh;
+            top: 10vh;
         }
 
         a {
@@ -293,7 +293,6 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
             width: 90%;
             height: 250px;
             left: 6%;
-            top: 22vh;
         }
 
         /* Localización */
@@ -341,6 +340,8 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         }
 
         .location-container {
+            position: relative;
+            top: 20vh;
             border: 1px solid transparent;
             background: #f5f7fa;
             padding: 20px;
@@ -432,8 +433,9 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         }
 
         .academias {
+            position: relative;
+            top: 22vh;
             width: 90%;
-            max-width: 1200px;
             margin: 30px auto;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -460,10 +462,11 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
             margin-top: 0;
             margin-bottom: 6px;
             font-size: 16px;
+            font-weight: 700;
         }
 
         .academia-card p {
-            color: #555;
+            color: #000;
             line-height: 1.6;
             margin: 0;
             font-size: 12px;
@@ -497,30 +500,27 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
             </div>
         </section>
 
-        <!-- Botones de sesión (cuando NO hay usuario logueado) -->
-            <?php if (!$usuarioLogueado): ?>
-            <!-- Botones de sesión -->
+        <?php if (!$usuarioLogueado): ?>
             <div class="auth_buttons" id="sessionButtons">
-                <a href="InicioSesion.html" class="button_LogIn">
+                <a href="InicioSesion.php" class="button_LogIn">
                     <span class="text_Button">Log In</span>                
                 </a>
-                <a href="Registro.html" class="button_SignIn">
+                <a href="Registro.php" class="button_SignIn">
                     <span class="text_Button">Sign In</span>
                 </a>
             </div>
         <?php else: ?>
-            <!-- Botones de usuario -->
             <div class="user_actions" id="userButtons">
-                <a href="BolsaCompra.html" class="button_Buy">
+                <a href="BolsaCompra.php" class="button_Buy">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </a>
-                <a href="Perfil.html" class="button_User">
+                <a href="Perfil.php" class="button_User">
                     <i class="fa-solid fa-user"></i>
                 </a>
             </div>
         <?php endif; ?>
-
     </header>
+
     <!-- La barra de navegación -->
     <section class="bar_buttons">
         <!-- Botón de Inicio -->
