@@ -18,6 +18,11 @@ try {
 $usuarioLogueado = isset($_SESSION['usuario_id']) && $_SESSION['usuario_id'] != '';
 $nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
 
+// Inicializar carrito si no existe
+if (!isset($_SESSION['carrito'])) {
+    $_SESSION['carrito'] = [];
+}
+
 // Función para obtener productos por categoría
 function obtenerProductosPorCategoria($pdo, $categoria) {
     $stmt = $pdo->prepare("SELECT * FROM productos WHERE categoria = ?");
@@ -38,6 +43,13 @@ function obtenerTallasStock($pdo, $producto_id) {
     return $stmt->fetchAll(PDO::FETCH_ASSOC);
 }
 
+// Función para obtener detalles de un producto
+function obtenerProducto($pdo, $producto_id) {
+    $stmt = $pdo->prepare("SELECT * FROM productos WHERE id = ?");
+    $stmt->execute([$producto_id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 // Procesar añadir al carrito
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     if (!$usuarioLogueado) {
@@ -45,16 +57,71 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         exit();
     }
     
-    // Validar y procesar el producto
     $producto_id = $_POST['product_id'] ?? null;
     $talla = $_POST['product_size'] ?? '';
     $cantidad = intval($_POST['product_quantity'] ?? 1);
     
     if ($producto_id && $talla && $cantidad > 0) {
-        // Aquí iría la lógica para añadir al carrito
-        // Por ahora solo mostramos un mensaje
-        $mensaje = "Producto añadido al carrito: ID $producto_id, Talla $talla, Cantidad $cantidad";
+        $producto = obtenerProducto($pdo, $producto_id);
+        
+        // Verificar stock disponible (implementación básica)
+        $tallasStock = obtenerTallasStock($pdo, $producto_id);
+        $stockDisponible = 0;
+        foreach ($tallasStock as $ts) {
+            if ($ts['talla'] == $talla) {
+                $stockDisponible = $ts['cantidad'];
+                break;
+            }
+        }
+        
+        if ($cantidad <= $stockDisponible) {
+            // Crear item del carrito
+            $item = [
+                'producto_id' => $producto_id,
+                'nombre' => $producto['nombre'],
+                'precio' => $producto['precio'],
+                'imagen' => $producto['imagen'],
+                'talla' => $talla,
+                'cantidad' => $cantidad,
+                'subtotal' => $producto['precio'] * $cantidad
+            ];
+            
+            // Verificar si el producto ya está en el carrito
+            $encontrado = false;
+            foreach ($_SESSION['carrito'] as &$productoCarrito) {
+                if ($productoCarrito['producto_id'] == $producto_id && $productoCarrito['talla'] == $talla) {
+                    $productoCarrito['cantidad'] += $cantidad;
+                    $productoCarrito['subtotal'] = $productoCarrito['precio'] * $productoCarrito['cantidad'];
+                    $encontrado = true;
+                    break;
+                }
+            }
+            
+            if (!$encontrado) {
+                $_SESSION['carrito'][] = $item;
+            }
+            
+            $mensaje = "Producto añadido al carrito correctamente";
+        } else {
+            $mensaje = "No hay suficiente stock disponible";
+        }
     }
+}
+
+// Procesar eliminar del carrito
+if (isset($_GET['eliminar'])) {
+    $indice = $_GET['eliminar'];
+    if (isset($_SESSION['carrito'][$indice])) {
+        unset($_SESSION['carrito'][$indice]);
+        $_SESSION['carrito'] = array_values($_SESSION['carrito']); // Reindexar array
+        $mensaje = "Producto eliminado del carrito";
+    }
+}
+
+// Calcular total del carrito
+$totalCarrito = 0;
+foreach ($_SESSION['carrito'] as $item) {
+    $totalCarrito += $item['subtotal'];
 }
 ?>
 
@@ -70,10 +137,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         /* Estilos CSS mejorados */
+        .stock{
+            position: absolute;
+            width: 90%;
+            left: 5%;
+            top: 24vh;
+            height:auto;
+        }
+
         .product-section {
-            margin: 20px 0;
-            padding: 20px 0;
-            border-bottom: 1px solid #eee;
+            position: relative;
+            bottom: 20px;
         }
         
         .product-container {
@@ -81,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
             flex-wrap: wrap;
             gap: 20px;
             justify-content: center;
-            padding: 20px 0;
+            padding: 10px 0;
         }
         
         .product-card {
@@ -99,11 +173,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         }
         
         .product-image {
-            height: 200px;
+            height: 300px;
             background-size: contain;
             background-position: center;
             background-repeat: no-repeat;
-            background-color: #f9f9f9;
+            background-color: #FFFFFF;
         }
         
         .product-info {
@@ -126,12 +200,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         /* Modal styles */
         .modal {
             display: none;
-            position: fixed;
+            position: absolute;
             z-index: 1000;
             left: 0;
             top: 0;
             width: 100%;
-            height: 100%;
+            height: auto;
             background-color: rgba(0,0,0,0.7);
         }
         
@@ -167,13 +241,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
             margin-right: auto;
         }
         
-        .form-group {
-            margin-bottom: 15px;
-        }
         
         .form-group label {
             display: block;
-            margin-bottom: 5px;
             font-weight: bold;
         }
         
@@ -198,7 +268,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         }
         
         .btn-primary:hover {
-            background-color: #2337a8;
+            background-color: #3046CF;
         }
         
         .stock-info {
@@ -216,9 +286,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         
         .section-title {
             font-size: 24px;
-            color: #333;
-            margin-bottom: 20px;
-            text-align: center;
+            color: #3046CF;
+            text-align: start;
             font-weight: bold;
         }
     </style>
@@ -243,19 +312,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
 
         <?php if (!$usuarioLogueado): ?>
             <div class="auth_buttons" id="sessionButtons">
-                <a href="InicioSesion.html" class="button_LogIn">
+                <a href="InicioSesion.php" class="button_LogIn">
                     <span class="text_Button">Log In</span>                
                 </a>
-                <a href="Registro.html" class="button_SignIn">
+                <a href="Registro.php" class="button_SignIn">
                     <span class="text_Button">Sign In</span>
                 </a>
             </div>
         <?php else: ?>
             <div class="user_actions" id="userButtons">
-                <a href="BolsaCompra.html" class="button_Buy">
+                <a href="BolsaCompra.php" class="button_Buy">
                     <i class="fa-solid fa-bag-shopping"></i>
                 </a>
-                <a href="Perfil.html" class="button_User">
+                <a href="Perfil.php" class="button_User">
                     <i class="fa-solid fa-user"></i>
                 </a>
             </div>
@@ -298,85 +367,87 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         </div>
     <?php endif; ?>
 
-    <!-- Sección de Judogis -->
-    <section class="product-section">
-        <h2 class="section-title">Judogis</h2>
-        <div class="product-container">
-            <?php
-            $judogis = obtenerProductosPorCategoria($pdo, 'judogi');
-            foreach ($judogis as $producto): 
-                $tallasStock = obtenerTallasStock($pdo, $producto['id']);
-            ?>
-                <div class="product-card" onclick="showProductModal(
-                    <?php echo $producto['id']; ?>,
-                    '<?php echo addslashes($producto['nombre']); ?>',
-                    '<?php echo addslashes($producto['descripcion']); ?>',
-                    <?php echo $producto['precio']; ?>,
-                    '<?php echo $producto['imagen']; ?>',
-                    <?php echo json_encode($tallasStock); ?>
-                )">
-                    <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
-                    <div class="product-info">
-                        <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
-                        <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
+    <section class="stock">
+        <!-- Sección de Judogis -->
+        <section class="product-section">
+            <h2 class="section-title">Judogis</h2>
+            <div class="product-container">
+                <?php
+                $judogis = obtenerProductosPorCategoria($pdo, 'judogi');
+                foreach ($judogis as $producto): 
+                    $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+                ?>
+                    <div class="product-card" onclick="showProductModal(
+                        <?php echo $producto['id']; ?>,
+                        '<?php echo htmlspecialchars($producto['nombre'], ENT_QUOTES); ?>',
+                        '<?php echo htmlspecialchars($producto['descripcion'], ENT_QUOTES); ?>',
+                        <?php echo $producto['precio']; ?>,
+                        '<?php echo $producto['imagen']; ?>',
+                        <?php echo htmlspecialchars(json_encode($tallasStock), ENT_QUOTES); ?>
+                    )">
+                        <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
+                        <div class="product-info">
+                            <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
+                            <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
+                        </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </section>
+                <?php endforeach; ?>
+            </div>
+        </section>
+    
+        <!-- Sección de Cintas -->
+        <section class="product-section">
+            <h2 class="section-title">Cintas</h2>
+            <div class="product-container">
+                <?php
+                $cintas = obtenerProductosPorCategoria($pdo, 'cinta');
+                foreach ($cintas as $producto): 
+                    $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+                ?>
+                    <div class="product-card" onclick="showProductModal(
+                        <?php echo $producto['id']; ?>,
+                        '<?php echo htmlspecialchars($producto['nombre'], ENT_QUOTES); ?>',
+                        '<?php echo htmlspecialchars($producto['descripcion'], ENT_QUOTES); ?>',
+                        <?php echo $producto['precio']; ?>,
+                        '<?php echo $producto['imagen']; ?>',
+                        <?php echo htmlspecialchars(json_encode($tallasStock), ENT_QUOTES); ?>
+                    )">
+                        <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
+                        <div class="product-info">
+                            <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
+                            <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
 
-    <!-- Sección de Cintas -->
-    <section class="product-section">
-        <h2 class="section-title">Cintas</h2>
-        <div class="product-container">
-            <?php
-            $cintas = obtenerProductosPorCategoria($pdo, 'cinta');
-            foreach ($cintas as $producto): 
-                $tallasStock = obtenerTallasStock($pdo, $producto['id']);
-            ?>
-                <div class="product-card" onclick="showProductModal(
+        <!-- Sección de Rodilleras -->
+        <section class="product-section">
+            <h2 class="section-title">Rodilleras</h2>
+            <div class="product-container">
+                <?php
+                $rodilleras = obtenerProductosPorCategoria($pdo, 'rodillera');
+                foreach ($rodilleras as $producto): 
+                    $tallasStock = obtenerTallasStock($pdo, $producto['id']);
+                ?>
+                    <div class="product-card" onclick="showProductModal(
                     <?php echo $producto['id']; ?>,
-                    '<?php echo addslashes($producto['nombre']); ?>',
-                    '<?php echo addslashes($producto['descripcion']); ?>',
+                    '<?php echo htmlspecialchars($producto['nombre'], ENT_QUOTES); ?>',
+                    '<?php echo htmlspecialchars($producto['descripcion'], ENT_QUOTES); ?>',
                     <?php echo $producto['precio']; ?>,
                     '<?php echo $producto['imagen']; ?>',
-                    <?php echo json_encode($tallasStock); ?>
+                    <?php echo htmlspecialchars(json_encode($tallasStock), ENT_QUOTES); ?>
                 )">
-                    <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
-                    <div class="product-info">
-                        <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
-                        <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
+                        <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
+                        <div class="product-info">
+                            <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
+                            <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
+                        </div>
                     </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </section>
-
-    <!-- Sección de Rodilleras -->
-    <section class="product-section">
-        <h2 class="section-title">Rodilleras</h2>
-        <div class="product-container">
-            <?php
-            $rodilleras = obtenerProductosPorCategoria($pdo, 'rodillera');
-            foreach ($rodilleras as $producto): 
-                $tallasStock = obtenerTallasStock($pdo, $producto['id']);
-            ?>
-                <div class="product-card" onclick="showProductModal(
-                    <?php echo $producto['id']; ?>,
-                    '<?php echo addslashes($producto['nombre']); ?>',
-                    '<?php echo addslashes($producto['descripcion']); ?>',
-                    <?php echo $producto['precio']; ?>,
-                    '<?php echo $producto['imagen']; ?>',
-                    <?php echo json_encode($tallasStock); ?>
-                )">
-                    <div class="product-image" style="background-image: url('<?php echo $producto['imagen']; ?>')"></div>
-                    <div class="product-info">
-                        <h3 class="product-name"><?php echo htmlspecialchars($producto['nombre']); ?></h3>
-                        <p class="product-price">$<?php echo number_format($producto['precio'], 2); ?> MXN</p>
-                    </div>
-                </div>
-            <?php endforeach; ?>
-        </div>
+                <?php endforeach; ?>
+            </div>
+        </section>
     </section>
 
     <!-- Modal de Producto -->
@@ -384,9 +455,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
             <img id="modalProductImage" src="" alt="Producto" class="modal-image">
-            <h2 id="modalProductName"></h2>
-            <p id="modalProductDescription" style="margin-bottom: 15px;"></p>
-            <p id="modalProductPrice" style="font-size: 20px; font-weight: bold; color: #3046CF; margin-bottom: 20px;"></p>
+            <h5 id="modalProductName"></h5>
+            <p id="modalProductDescription" style="margin-bottom: 12px;"></p>
+            <p id="modalProductPrice" style="font-size: 16px; font-weight: bold; color: #3046CF; margin-bottom: 20px;"></p>
             
             <form method="post" id="productForm">
                 <input type="hidden" name="product_id" id="modalProductId">
@@ -414,20 +485,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
     <div class="container2"></div>
 
     <script>
-        // Mostrar modal del producto
-        function showProductModal(id, name, description, price, image, sizes) {
-            const modal = document.getElementById('productModal');
-            const sizeSelect = document.getElementById('productSize');
+    // Debug: Verificar que el script se carga
+    console.log("Script de modal cargado - Versión corregida");
+    
+    // Función para mostrar el modal
+    window.showProductModal = function(id, name, description, price, image, sizes) {
+        console.log("Función showProductModal llamada con:", {id, name});
+        
+        const modal = document.getElementById('productModal');
+        if (!modal) {
+            console.error("No se encontró el elemento modal");
+            return;
+        }
+        
+        // Llenar información del producto
+        document.getElementById('modalProductId').value = id;
+        document.getElementById('modalProductName').textContent = name;
+        document.getElementById('modalProductDescription').textContent = description;
+        document.getElementById('modalProductPrice').textContent = '$' + parseFloat(price).toFixed(2) + ' MXN';
+        document.getElementById('modalProductImage').src = image;
+        
+        // Llenar opciones de talla
+        const sizeSelect = document.getElementById('productSize');
+        sizeSelect.innerHTML = '';
+        
+        try {
+            // Asegurarse de que sizes es un array
+            if (typeof sizes === 'string') {
+                sizes = JSON.parse(sizes);
+            }
             
-            // Llenar información del producto
-            document.getElementById('modalProductId').value = id;
-            document.getElementById('modalProductName').textContent = name;
-            document.getElementById('modalProductDescription').textContent = description;
-            document.getElementById('modalProductPrice').textContent = '$' + price.toFixed(2) + ' MXN';
-            document.getElementById('modalProductImage').src = image;
-            
-            // Llenar opciones de talla
-            sizeSelect.innerHTML = '';
             sizes.forEach(size => {
                 const option = document.createElement('option');
                 option.value = size.talla;
@@ -435,58 +522,72 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['add_to_cart'])) {
                 option.disabled = size.cantidad <= 0;
                 sizeSelect.appendChild(option);
             });
-            
-            // Actualizar información de stock
-            updateStockInfo();
-            
-            // Mostrar modal
-            modal.style.display = 'block';
+        } catch (e) {
+            console.error("Error procesando tallas:", e);
         }
         
-        // Actualizar información de stock
-        function updateStockInfo() {
-            const sizeSelect = document.getElementById('productSize');
-            const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
-            const stockInfo = document.getElementById('stockInfo');
-            const quantityInput = document.getElementById('productQuantity');
-            const addButton = document.querySelector('.btn-primary');
-            
-            // Obtener el stock de la opción seleccionada
-            const sizeText = selectedOption.value;
-            const isDisabled = selectedOption.disabled;
-            
-            if (isDisabled) {
-                stockInfo.textContent = 'Agotado';
-                stockInfo.className = 'stock-info out-of-stock';
-                quantityInput.disabled = true;
+        updateStockInfo();
+        modal.style.display = 'block';
+    };
+    
+    function updateStockInfo() {
+        const sizeSelect = document.getElementById('productSize');
+        if (!sizeSelect || sizeSelect.options.length === 0) return;
+        
+        const selectedOption = sizeSelect.options[sizeSelect.selectedIndex];
+        const stockInfo = document.getElementById('stockInfo');
+        const quantityInput = document.getElementById('productQuantity');
+        const addButton = document.querySelector('button[name="add_to_cart"]');
+        
+        if (selectedOption.disabled) {
+            stockInfo.textContent = 'Agotado';
+            stockInfo.className = 'stock-info out-of-stock';
+            if (quantityInput) quantityInput.disabled = true;
+            if (addButton) {
                 addButton.disabled = true;
                 addButton.style.opacity = '0.6';
-            } else {
-                // Aquí deberías tener acceso al stock real desde los datos del producto
-                // Por ahora mostramos un mensaje genérico
-                stockInfo.textContent = 'Disponible';
-                stockInfo.className = 'stock-info in-stock';
-                quantityInput.disabled = false;
+            }
+        } else {
+            stockInfo.textContent = 'Disponible';
+            stockInfo.className = 'stock-info in-stock';
+            if (quantityInput) quantityInput.disabled = false;
+            if (addButton) {
                 addButton.disabled = false;
                 addButton.style.opacity = '1';
-                
-                // Establecer máximo según disponibilidad
-                // quantityInput.max = stockDisponible;
             }
         }
+    }
+    
+    window.closeModal = function() {
+        document.getElementById('productModal').style.display = 'none';
+    };
+    
+    // Event listeners mejorados
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM completamente cargado");
         
-        // Cerrar modal
-        function closeModal() {
-            document.getElementById('productModal').style.display = 'none';
+        // Cerrar al hacer clic en la X
+        const closeBtn = document.querySelector('.modal .close');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', closeModal);
         }
         
-        // Cerrar modal al hacer clic fuera
-        window.onclick = function(event) {
-            const modal = document.getElementById('productModal');
-            if (event.target == modal) {
-                closeModal();
-            }
-        };
-    </script>
+        // Cerrar al hacer clic fuera del modal
+        const modal = document.getElementById('productModal');
+        if (modal) {
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+        
+        // Actualizar stock al cambiar talla
+        const sizeSelect = document.getElementById('productSize');
+        if (sizeSelect) {
+            sizeSelect.addEventListener('change', updateStockInfo);
+        }
+    });
+</script>
 </body>
 </html>
