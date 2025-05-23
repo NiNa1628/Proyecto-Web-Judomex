@@ -348,20 +348,8 @@ if (!empty($_SESSION['carrito'])) {
             </div>
         </section>
 
-        <?php if (!$usuarioLogueado): ?>
-            <div class="auth_buttons" id="sessionButtons">
-                <a href="InicioSesion.php" class="button_LogIn">
-                    <span class="text_Button">Log In</span>                
-                </a>
-                <a href="Registro.php" class="button_SignIn">
-                    <span class="text_Button">Sign In</span>
-                </a>
-            </div>
-        <?php else: ?>
+        <?php if ($usuarioLogueado): ?>
             <div class="user_actions" id="userButtons">
-                <a href="BolsaCompra.php" class="button_Buy">
-                    <i class="fa-solid fa-bag-shopping"></i>
-                </a>
                 <a href="Perfil.php" class="button_User">
                     <i class="fa-solid fa-user"></i>
                 </a>
