@@ -265,12 +265,12 @@ a {
 }
 
 .container_Ubicacion{
-    position: relative;
+    position: absolute;
     display: flex;
     width: 90%;
     height: 250px;
     left: 6%;
-    top: 24vh;
+    top: 22vh;
 }
 
 /* Localización */
@@ -318,6 +318,7 @@ a {
 }
 
 .location-container {
+    border: 1px solid transparent;
     background: #f5f7fa;
     padding: 20px;
     border-radius: 12px;
@@ -446,12 +447,11 @@ a {
 }
 
 /* Por si pongo créditos */
-.container2 {
+.container2{
     position: absolute;
-    bottom: 0;
-    left: 0;
     width: 100%;
     height: 33px;
+    top: 118vh;
+
     background: #3046CF;
-    z-index: 1000;
 }

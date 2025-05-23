@@ -163,6 +163,7 @@ body.logged-in .user_actions {
     font-size: 20px;
     color: white;
 }
+
 /* Barra de botones */
 .bar_buttons{
     position: absolute;
@@ -248,3 +249,12 @@ a {
     color: #FFFFFF;
 }
 
+/* Por si pongo créditos */
+.container2{
+    position: absolute;
+    width: 100%;
+    height: 33px;
+    top: 140vh;
+
+    background: #3046CF;
+}

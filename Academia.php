@@ -21,7 +21,7 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <style>
-                /* Estilos generales */
+    /* Estilos generales */
         body{
             position: relative;
             width: 100%;
@@ -288,12 +288,12 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         }
 
         .container_Ubicacion{
-            position: relative;
+            position: absolute;
             display: flex;
             width: 90%;
             height: 250px;
             left: 6%;
-            top: 24vh;
+            top: 22vh;
         }
 
         /* Localización */
@@ -470,14 +470,13 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         }
 
         /* Por si pongo créditos */
-        .container2 {
+        .container2{
             position: absolute;
-            bottom: 0;
-            left: 0;
             width: 100%;
             height: 33px;
+            top: 118vh;
+
             background: #3046CF;
-            z-index: 1000;
         }
     </style>
 </head>
@@ -538,8 +537,8 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
         </a>
         <!-- Botón de Academia -->
         <a href="Academia.php" class="nav-link">
-            <div class="noSelect_Button">
-                <span class="noSeleccionado">Academia</span>
+            <div class="select_Button">
+                <span class="seleccionado">Academia</span>
             </div>
         </a>
         <!-- Botón de Entrenamiento -->
