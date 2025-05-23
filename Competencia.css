@@ -149,7 +149,6 @@ body.logged-in .user_actions {
     justify-content: center;
     width: 40px;
     height: 40px;
-    background: #333;
     border-radius: 50%;
     color: white;
     text-decoration: none;
@@ -157,7 +156,6 @@ body.logged-in .user_actions {
 }
 
 .button_Buy:hover, .button_User:hover {
-    background: #555;
     transform: scale(1.05);
 }
 
@@ -165,7 +163,6 @@ body.logged-in .user_actions {
     font-size: 20px;
     color: white;
 }
-
 /* Barra de botones */
 .bar_buttons{
     position: absolute;
