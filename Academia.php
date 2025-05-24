@@ -524,7 +524,7 @@ error_log("Datos de sesión: " . print_r($_SESSION, true));
     <!-- La barra de navegación -->
     <section class="bar_buttons">
         <!-- Botón de Inicio -->
-        <a href="Inicio.html" class="nav-link">
+        <a href="Inicio.php" class="nav-link">
             <div class="noSelect_Button">
                 <span class="noSeleccionado">Inicio</span>
             </div>
