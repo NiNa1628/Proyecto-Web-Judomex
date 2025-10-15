@@ -20,5 +20,3 @@ Carrito y compra de productos
 Registro a competencias
 Panel de administración (opcional, para ver registros y participantes)
 Base de datos sincronizada en tiempo real con Firebase Firestore.
-
-Contiene manuales.
